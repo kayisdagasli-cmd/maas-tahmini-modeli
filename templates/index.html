@@ -1,84 +1,33 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <title>Maaş Tahmin Modeli | Pro</title>
-    <style>
-        :root { --bordo: #800000; --dark: #121212; --card: #1e1e1e; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; }
-        .card { background: var(--card); padding: 25px; border-radius: 15px; border-top: 5px solid var(--bordo); margin-bottom: 20px; }
-        h1, h2 { color: white; margin-top: 0; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        input, select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: var(--bordo); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px; }
-        .result-box { text-align: center; background: rgba(128, 0, 0, 0.2); padding: 20px; border-radius: 10px; border: 1px solid var(--bordo); }
-        
-        /* Grafik Alanı Simülasyonu */
-        .chart-container { overflow-x: auto; white-space: nowrap; padding: 20px 0; }
-        .bar { display: inline-block; width: 8px; background: var(--bordo); margin-right: 2px; border-radius: 2px 2px 0 0; }
-        .bar.active { background: #ff4d4d; width: 10px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="card">
-            <h1>Maaş Tahmin Modeli</h1>
-            <p style="color: #888;">Bilişim sektörü için 81 il üzerinden maaş analizi</p>
-            
-            <form action="/predict" method="post">
-                <div class="form-grid">
-                    <div>
-                        <label>Yaş</label>
-                        <input type="number" name="yas" value="25" min="18" max="65">
-                    </div>
-                    <div>
-                        <label>Deneyim (Yıl)</label>
-                        <input type="number" name="deneyim" value="3" min="0">
-                    </div>
-                    <div>
-                        <label>Eğitim Durumu</label>
-                        <select name="egitim">
-                            <option>Lisans</option>
-                            <option>Yüksek Lisans</option>
-                            <option>Doktora</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Meslek</label>
-                        <select name="meslek">
-                            <option>Yazılım Geliştirici</option>
-                            <option>Veri Bilimci</option>
-                            <option>Yazılım Mimarı</option>
-                        </select>
-                    </div>
-                </div>
-                <label style="display:block; margin-top:15px;">Şehir</label>
-                <select name="sehir">
-                    {% for sehir in sehirler %}
-                    <option value="{{ sehir }}" {% if sehir == secilen_sehir %}selected{% endif %}>{{ sehir }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit">Maaşı Tahmin Et</button>
-            </form>
-        </div>
-
-        {% if tahmin %}
-        <div class="card result-box">
-            <h2>Tahmini Aylık Maaş</h2>
-            <div style="font-size: 2.5rem; font-weight: bold; color: #ff4d4d;">{{ tahmin }} TL</div>
-            <p style="font-size: 0.8rem; color: #888;">Çoklu Lineer Regresyon modeli tahminidir.</p>
-        </div>
-
-        <div class="card">
-            <h2>81 İlin Maaş Karşılaştırması</h2>
-            <div class="chart-container">
-                {% for i in range(81) %}
-                <div class="bar" style="height: {{ 100 + (i % 20) * 5 }}px;"></div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
+<div class="grid-inputs">
+    <div>
+        <label>Yaş</label>
+        <input type="number" name="yas" value="{{ yas if yas else 25 }}" min="18" max="65">
+        <small style="color: #666; font-size: 11px;">* 18-65 yaş arası giriniz.</small>
     </div>
-</body>
-</html>
+    <div>
+        <label>Deneyim (Yıl)</label>
+        <input type="number" name="deneyim" value="{{ deneyim if deneyim else 3 }}" min="0" max="45">
+        <small style="color: #666; font-size: 11px;">* En fazla yaş - 18 kadar olabilir.</small>
+    </div>
+    <div>
+        <label>Eğitim Durumu</label>
+        <select name="egitim">
+            <option>Lise</option>
+            <option selected>Lisans</option>
+            <option>Yüksek Lisans</option>
+            <option>Doktora</option>
+        </select>
+    </div>
+    <div>
+        <label>Meslek</label>
+        <select name="meslek">
+            <option>Frontend Geliştirici</option>
+            <option>Backend Geliştirici</option>
+            <option>Mobil Geliştirici</option>
+            <option>Veri Bilimci</option>
+            <option>Siber Güvenlik Uzmanı</option>
+            <option>DevOps Mühendisi</option>
+            <option>Yazılım Mimarı</option>
+        </select>
+    </div>
+</div>
