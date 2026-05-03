@@ -1,33 +1,85 @@
-<div class="grid-inputs">
-    <div>
-        <label>Yaş</label>
-        <input type="number" name="yas" value="{{ yas if yas else 25 }}" min="18" max="65">
-        <small style="color: #666; font-size: 11px;">* 18-65 yaş arası giriniz.</small>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maaş Tahmin Modeli | Pro</title>
+    <style>
+        :root { --bordo: #800000; --koyu-bg: #0d0d0d; --kart-bg: #1a1a1a; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--koyu-bg); color: #e0e0e0; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 800px; }
+        .card { background: var(--kart-bg); border-radius: 15px; padding: 30px; border-top: 4px solid var(--bordo); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: white; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
+        input, select { width: 100%; padding: 12px; background: #262626; border: 1px solid #444; border-radius: 8px; color: white; box-sizing: border-box; }
+        input:focus, select:focus { border-color: var(--bordo); outline: none; }
+        button { width: 100%; padding: 15px; background: var(--bordo); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 25px; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #a00000; transform: translateY(-2px); }
+        .result { margin-top: 25px; padding: 20px; background: rgba(128, 0, 0, 0.1); border: 1px solid var(--bordo); border-radius: 10px; text-align: center; }
+        .price { font-size: 36px; font-weight: bold; color: #ff4d4d; }
+        small { color: #666; font-size: 11px; display: block; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Maaş Tahmin Modeli</h1>
+            <form action="/predict" method="post">
+                <div class="grid">
+                    <div>
+                        <label>Yaş</label>
+                        <input type="number" name="yas" value="{{ yas if yas else 25 }}" min="18" max="65">
+                        <small>* 18-65 yaş arası giriniz.</small>
+                    </div>
+                    <div>
+                        <label>Deneyim (Yıl)</label>
+                        <input type="number" name="deneyim" value="{{ deneyim if deneyim else 3 }}" min="0" max="45">
+                        <small>* En fazla Yaş - 18 girebilirsiniz.</small>
+                    </div>
+                    <div>
+                        <label>Eğitim Durumu</label>
+                        <select name="egitim">
+                            <option>Lise</option>
+                            <option selected>Lisans</option>
+                            <option>Yüksek Lisans</option>
+                            <option>Doktora</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Meslek</label>
+                        <select name="meslek">
+                            <option>Frontend Geliştirici</option>
+                            <option>Backend Geliştirici</option>
+                            <option>Fullstack Geliştirici</option>
+                            <option>Mobil Uygulama Geliştirici</option>
+                            <option>Veri Bilimci</option>
+                            <option>Yapay Zeka Uzmanı</option>
+                            <option>Siber Güvenlik Uzmanı</option>
+                            <option>DevOps Mühendisi</option>
+                            <option>Oyun Geliştirici (Game Dev)</option>
+                            <option>Yazılım Mimarı</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <label>Şehir</label>
+                    <select name="sehir">
+                        {% for sehir in sehirler %}
+                        <option value="{{ sehir }}" {% if sehir == secilen_sehir %}selected{% endif %}>{{ sehir }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit">Hesaplamayı Başlat</button>
+            </form>
+
+            {% if tahmin %}
+            <div class="result">
+                <h3 style="margin:0;">Tahmini Aylık Maaş</h3>
+                <div class="price">{{ tahmin }} TL</div>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    <div>
-        <label>Deneyim (Yıl)</label>
-        <input type="number" name="deneyim" value="{{ deneyim if deneyim else 3 }}" min="0" max="45">
-        <small style="color: #666; font-size: 11px;">* En fazla yaş - 18 kadar olabilir.</small>
-    </div>
-    <div>
-        <label>Eğitim Durumu</label>
-        <select name="egitim">
-            <option>Lise</option>
-            <option selected>Lisans</option>
-            <option>Yüksek Lisans</option>
-            <option>Doktora</option>
-        </select>
-    </div>
-    <div>
-        <label>Meslek</label>
-        <select name="meslek">
-            <option>Frontend Geliştirici</option>
-            <option>Backend Geliştirici</option>
-            <option>Mobil Geliştirici</option>
-            <option>Veri Bilimci</option>
-            <option>Siber Güvenlik Uzmanı</option>
-            <option>DevOps Mühendisi</option>
-            <option>Yazılım Mimarı</option>
-        </select>
-    </div>
-</div>
+</body>
+</html>
