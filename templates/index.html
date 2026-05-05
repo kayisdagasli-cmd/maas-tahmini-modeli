@@ -3,49 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maaş Tahmin Modeli | Kariyer Analizi</title>
+    <title>Maaş Tahmin Modeli</title>
     <script src="https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"></script>
     <style>
-        :root { --bordo: #800000; --koyu: #0d0d0d; --kart: #1a1a1a; --text: #ffffff; }
-        body { background: var(--koyu); color: var(--text); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 850px; margin: auto; }
-        .card { background: var(--kart); border-radius: 12px; padding: 25px; border-top: 5px solid var(--bordo); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2, h3 { color: white; margin-top: 0; }
+        :root { --bordo: #800000; --koyu: #0b0b0b; --kart: #1a1a1a; --text: #ffffff; }
+        body { background: var(--koyu); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .card { background: var(--kart); border-radius: 12px; padding: 25px; border-top: 4px solid var(--bordo); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        input, select { width: 100%; padding: 12px; background: #262626; border: 1px solid #444; border-radius: 8px; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; background: var(--bordo); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; margin-top: 15px; }
-        .btn:hover { background: #a00000; transform: translateY(-2px); }
-        .price { font-size: 50px; color: #ff4d4d; font-weight: bold; margin: 10px 0; }
-        .bar-chart { display: flex; align-items: flex-end; height: 100px; gap: 2px; overflow-x: auto; padding: 10px; background: #111; border-radius: 8px; margin-top: 15px; }
-        .bar { min-width: 8px; background: var(--bordo); height: 15px; border-radius: 2px 2px 0 0; }
-        .bar-active { background: #ff4d4d; min-width: 12px; height: 40px !important; }
-        .news-box { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .news-item { background: #222; padding: 15px; border-radius: 8px; border-left: 4px solid var(--bordo); font-size: 13px; line-height: 1.5; }
-        label { display: block; margin-bottom: 8px; font-size: 14px; color: #bbb; }
+        input, select { width: 100%; padding: 12px; background: #222; border: 1px solid #444; border-radius: 8px; color: white; box-sizing: border-box; }
+        .not { font-size: 11px; color: #ff4d4d; margin-top: 5px; display: block; }
+        .btn { width: 100%; padding: 15px; background: var(--bordo); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .price { font-size: 45px; color: #ff4d4d; font-weight: bold; }
+        .bar-chart { display: flex; align-items: flex-end; height: 120px; gap: 2px; background: #000; padding: 10px; border-radius: 8px; overflow-x: auto; }
+        .bar { min-width: 8px; background: var(--bordo); height: 20px; transition: 0.3s; }
+        .bar:hover { background: #ff4d4d; cursor: pointer; }
+        .bar-active { background: #ff4d4d; min-width: 12px; height: 50px !important; }
+        .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .news-card { background: #222; padding: 15px; border-radius: 8px; border-bottom: 3px solid var(--bordo); font-size: 13px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h2>Maaş Tahmin Modeli</h2>
+            <p style="font-size:12px; color:#888;">Bilişim sektörü için 81 il üzerinden maaş analizi</p>
             <form action="/predict" method="post">
                 <div class="grid">
-                    <div><label>Yaş</label><input type="number" name="yas" value="{{ yas if yas else 25 }}" required></div>
-                    <div><label>Deneyim (Yıl)</label><input type="number" name="deneyim" value="{{ deneyim if deneyim else 3 }}" required></div>
-                    <div><label>Eğitim</label>
+                    <div>
+                        <label>Yaş</label>
+                        <input type="number" name="yas" value="{{ yas if yas else 25 }}" required>
+                        <span class="not">* 18-65 yaş arası giriniz.</span>
+                    </div>
+                    <div>
+                        <label>Deneyim (Yıl)</label>
+                        <input type="number" name="deneyim" value="{{ deneyim if deneyim else 3 }}" required>
+                        <span class="not">* Sektörel tecrübenizi giriniz.</span>
+                    </div>
+                    <div>
+                        <label>Eğitim Durumu</label>
                         <select name="egitim">
-                            <option {% if egitim == 'Lise' %}selected{% endif %}>Lise</option>
-                            <option {% if not egitim or egitim == 'Lisans' %}selected{% endif %}>Lisans</option>
-                            <option {% if egitim == 'Yüksek Lisans' %}selected{% endif %}>Yüksek Lisans</option>
+                            <option>Lise</option><option selected>Lisans</option><option>Yüksek Lisans</option><option>Doktora</option>
                         </select>
                     </div>
-                    <div><label>Meslek</label>
+                    <div>
+                        <label>Meslek</label>
                         <select name="meslek">
-                            <option>Web Geliştirici</option>
-                            <option>Siber Güvenlik Uzmanı</option>
-                            <option selected>Yazılım Mimarı</option>
-                            <option>Veri Analisti</option>
-                            <option>Yapay Zeka Uzmanı</option>
+                            {% for m in meslekler %}<option>{{ m }}</option>{% endfor %}
                         </select>
                     </div>
                 </div>
@@ -55,25 +59,18 @@
                         {% for s in sehirler %}<option {% if s == secilen_sehir %}selected{% endif %}>{{ s }}</option>{% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn">Analiz Et ve Maaşı Tahmin Et</button>
+                <button type="submit" class="btn">Maaşı Tahmin Et</button>
             </form>
         </div>
 
-        {% if hata %}
-        <div class="card" style="border-color: #ff4d4d; color: #ff4d4d; text-align: center;">
-            <strong>Hata:</strong> {{ hata }}
-        </div>
-        {% endif %}
-
         {% if tahmin %}
         <div class="card" style="text-align: center;">
-            <h3>Tahmin Edilen Aylık Net Maaş</h3>
-            <div class="price" id="target">0</div>
-            <p>Bu rakam asgari ücretin yaklaşık <strong>{{ oran }}</strong> katıdır.</p>
-            
-            <div style="background:#111; padding: 15px; border-radius: 8px; text-align: left; border-left: 4px solid #ff4d4d;">
-                <p style="margin: 5px 0;">📍 <strong>{{ secilen_sehir }}</strong> yaşam maliyeti analiz edildi.</p>
-                <p style="margin: 5px 0;">📊 Geçim Endeksi: <strong>72/100 (İyi)</strong></p>
+            <h3>Analiz & Kıyaslama</h3>
+            <div class="price" id="sayac">0</div>
+            <p>Asgari ücretin <strong>{{ oran }}</strong> katı maaş alıyorsunuz.</p>
+            <div style="background:#111; padding: 15px; border-radius: 8px; text-align: left; border-left: 4px solid var(--bordo);">
+                <p>📍 Şehir Analizi: <strong>{{ secilen_sehir }}</strong> yaşam maliyeti hesaplandı.</p>
+                <p>📊 Geçim Endeksi: <strong>72/100 (İyi)</strong></p>
             </div>
         </div>
 
@@ -89,36 +86,21 @@
         {% endif %}
 
         <div class="card">
-            <h3>Sektörel Gelişmeler & Haberler</h3>
-            <div class="news-box">
-                <div class="news-item"><strong>Yapay Zeka:</strong> 2026 yılına kadar AI destekli geliştirme araçlarını kullananların maaş artış hızı %40 daha fazla olacak.</div>
-                <div class="news-item"><strong>Uzaktan Çalışma:</strong> Türkiye'deki büyük ölçekli şirketlerin %65'i hibrit veya tam remote modele geçti.</div>
-                <div class="news-item"><strong>Siber Güvenlik:</strong> Global çapta uzman açığı rekor seviyeye ulaştı; giriş seviyesi maaşlarda %20 artış var.</div>
-                <div class="news-item"><strong>Yurtdışı Talebi:</strong> Avrupa ve ABD merkezli firmalar, Türkiye'den yetenekli yazılımcıları döviz bazlı ücretlerle transfer etmeye devam ediyor.</div>
+            <h3>Sektör Haberleri</h3>
+            <div class="news-grid">
+                <div class="news-card"><strong>AI Maaşları Artıyor:</strong> 2026'da yapay zeka bilen yazılımcıların maaşı %40 daha yüksek.</div>
+                <div class="news-card"><strong>Remote Devrimi:</strong> Şirketlerin %65'i hibrit veya tam remote modele geçti.</div>
+                <div class="news-card"><strong>Kripto Mühendisliği:</strong> Blockchain uzmanlarına olan talep son 1 yılda %200 arttı.</div>
             </div>
         </div>
     </div>
 
     <script>
         {% if tahmin %}
-        // Sayıyı JavaScript'in anlayacağı temiz formata (71200 gibi) çeviriyoruz
-        const rawValue = "{{ tahmin }}".replace(/\./g, '').replace(/,/g, '');
-        const targetNum = parseInt(rawValue);
-
-        // CountUp başlatma
-        const countUp = new CountUp('target', targetNum, {
-            separator: '.',
-            decimal: ',',
-            duration: 2 // 2 saniyede tamamlansın
-        });
-
-        if (!countUp.error) {
-            countUp.start();
-        } else {
-            // Eğer sayaç kütüphanesi hata verirse direkt yazdır
-            document.getElementById('target').innerText = "{{ tahmin }} TL";
-        }
+        const hedef = parseInt("{{ tahmin }}".replace(/\./g, ''));
+        new CountUp('sayac', hedef, { separator: '.', decimal: ',', duration: 2 }).start();
         {% endif %}
     </script>
 </body>
 </html>
+                   
