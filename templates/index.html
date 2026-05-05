@@ -3,86 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maaş Tahmin Modeli</title>
+    <title>Maaş Analiz Portalı v2.0</title>
     <script src="https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"></script>
     <style>
-        :root { --bordo: #800000; --bg: #0b0b0b; --card: #1a1a1a; --text: #ffffff; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; }
-        .container { max-width: 800px; margin: auto; }
-        .card { background: var(--card); border-radius: 12px; padding: 20px; border-top: 4px solid var(--bordo); margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        :root { --bordo: #800000; --bg: #0b0b0b; --card: #161616; --text: #e0e0e0; --accent: #ff4d4d; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 15px; }
+        .container { max-width: 850px; margin: auto; }
+        
+        .card { background: var(--card); border-radius: 15px; padding: 25px; border: 1px solid #222; border-top: 5px solid var(--bordo); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        h2, h3 { margin-top: 0; color: white; letter-spacing: 0.5px; }
+        
+        /* Form Gridi */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-        input, select { width: 100%; padding: 12px; background: #222; border: 1px solid #444; border-radius: 8px; color: white; box-sizing: border-box; font-size: 16px; }
-        .not { font-size: 11px; color: #ff4d4d; display: block; margin-top: 4px; }
-        .btn { width: 100%; padding: 15px; background: var(--bordo); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 16px; }
-        .price { font-size: clamp(35px, 10vw, 55px); color: #ff4d4d; font-weight: bold; margin: 10px 0; }
-        .bar-chart { display: flex; align-items: flex-end; height: 120px; gap: 2px; background: #000; padding: 10px; border-radius: 8px; overflow-x: auto; position: relative; }
-        .bar { min-width: 8px; background: var(--bordo); height: 15px; transition: 0.2s; cursor: pointer; }
-        .bar-active { background: #ff4d4d; min-width: 12px; height: 60px !important; }
-        #city-info { background: white; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px; position: absolute; display: none; pointer-events: none; z-index: 100; font-weight: bold; }
-        .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        @media (max-width: 600px) { .news-grid { grid-template-columns: 1fr; } }
-        .news-card { background: #222; padding: 12px; border-radius: 8px; font-size: 13px; border-bottom: 2px solid var(--bordo); }
+        
+        label { display: block; font-size: 13px; margin-bottom: 8px; color: #aaa; }
+        input, select { width: 100%; padding: 14px; background: #222; border: 1px solid #333; border-radius: 10px; color: white; box-sizing: border-box; font-size: 15px; transition: 0.3s; }
+        input:focus { border-color: var(--bordo); outline: none; background: #2a2a2a; }
+        
+        .btn { width: 100%; padding: 18px; background: var(--bordo); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; text-transform: uppercase; transition: 0.3s; }
+        .btn:hover { background: #a00000; transform: translateY(-2px); }
+
+        /* Analiz Kartları */
+        .analiz-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .analiz-grid { grid-template-columns: 1fr; } }
+        .sub-card { background: #202020; padding: 20px; border-radius: 12px; position: relative; overflow: hidden; }
+        
+        .big-price { font-size: 38px; color: var(--accent); font-weight: 800; margin: 10px 0; }
+        
+        /* Daire Grafik (Gauge) Taklidi */
+        .gauge-box { width: 150px; height: 75px; margin: 15px auto; position: relative; border-radius: 150px 150px 0 0; background: #333; overflow: hidden; }
+        .gauge-fill { position: absolute; top: 0; left: 0; width: 150px; height: 75px; background: var(--bordo); transform-origin: center bottom; transform: rotate(120deg); transition: 1s; }
+        .gauge-cover { position: absolute; top: 10px; left: 10px; width: 130px; height: 65px; background: #202020; border-radius: 130px 130px 0 0; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 22px; }
+
+        /* Çubuk Grafik */
+        .bar-chart { display: flex; align-items: flex-end; height: 140px; gap: 3px; background: #000; padding: 15px; border-radius: 12px; overflow-x: auto; position: relative; }
+        .bar { min-width: 9px; background: #440000; height: 15px; transition: 0.3s; cursor: pointer; border-radius: 2px 2px 0 0; }
+        .bar-active { background: var(--accent); min-width: 14px; box-shadow: 0 0 15px var(--accent); }
+        #city-popup { background: white; color: black; padding: 5px 12px; border-radius: 5px; position: absolute; display: none; font-size: 12px; font-weight: bold; z-index: 1000; pointer-events: none; }
+
+        /* Haberler */
+        .news-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        @media (max-width: 600px) { .news-container { grid-template-columns: 1fr; } }
+        .news-box { background: #1e1e1e; border-radius: 12px; border-bottom: 3px solid var(--bordo); padding: 15px; }
+        .news-tag { background: var(--bordo); font-size: 10px; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h2>Maaş Tahmin Modeli</h2>
+            <p style="color:#777; font-size: 13px; margin-bottom: 20px;">Bilişim sektörü için 81 il üzerinden gelişmiş analiz</p>
             <form action="/predict" method="post">
                 <div class="grid">
-                    <div><label>Yaş</label><input type="number" name="yas" value="{{ yas if yas else 25 }}" min="18" max="65" required><span class="not">* 18-65 yaş arası giriniz.</span></div>
-                    <div><label>Deneyim (Yıl)</label><input type="number" name="deneyim" value="{{ deneyim if deneyim else 3 }}" required><span class="not">* Sektörel tecrübe notu.</span></div>
-                    <div><label>Eğitim</label><select name="egitim"><option>Lise</option><option selected>Lisans</option><option>Yüksek Lisans</option><option>Doktora</option></select></div>
+                    <div><label>Yaş</label><input type="number" name="yas" value="{{ yas if yas else 25 }}" required></div>
+                    <div><label>Deneyim (Yıl)</label><input type="number" name="deneyim" value="{{ deneyim if deneyim else 3 }}" required></div>
+                    <div><label>Eğitim Durumu</label><select name="egitim"><option>Lise</option><option selected>Lisans</option><option>Yüksek Lisans</option><option>Doktora</option></select></div>
                     <div><label>Meslek</label><select name="meslek">{% for m in meslekler %}<option {% if m == meslek %}selected{% endif %}>{{ m }}</option>{% endfor %}</select></div>
                 </div>
-                <div style="margin-top:15px;"><label>Şehir</label><select name="sehir">{% for s in sehirler %}<option {% if s == secilen_sehir %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></div>
-                <button type="submit" class="btn">Maaşı Tahmin Et</button>
+                <div style="margin-top:20px;"><label>Şehir</label><select name="sehir">{% for s in sehirler %}<option {% if s == secilen_sehir %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></div>
+                <button type="submit" class="btn">Analizi Başlat</button>
             </form>
         </div>
 
-        {% if hata %}<div class="card" style="color:#ff4d4d; text-align:center;">{{ hata }}</div>{% endif %}
-
         {% if tahmin %}
+        <div class="card">
+            <h3>Analiz & Kıyaslama</h3>
+            <div class="analiz-grid">
+                <div class="sub-card">
+                    <label>Asgari Ücret Kıyaslaması</label>
+                    <div class="big-price" id="price1">0</div>
+                    <div class="gauge-box">
+                        <div class="gauge-fill" style="transform: rotate({{ (oran * 18) if oran < 10 else 180 }}deg);"></div>
+                        <div class="gauge-cover">%</div>
+                    </div>
+                    <p style="text-align:center; font-size: 14px;">Asgari ücretin <b>{{ oran }}</b> katıdır.</p>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:15px;">
+                    <div class="sub-card">
+                        <label>En Yüksek Şehir Kıyaslaması</label>
+                        <p style="margin:10px 0;">İstanbul: ~{{ ist_fark }} TL</p>
+                        <p style="margin:0; color:var(--accent);">{{ secilen_sehir }}: {{ tahmin }} TL</p>
+                    </div>
+                    <div class="sub-card">
+                        <label>Geçim Endeksi ({{ secilen_sehir }})</label>
+                        <p style="margin:10px 0;">Skor: <b>{{ skor }}/100</b></p>
+                        <p style="font-size:12px; color:#888;">Analiz: Yaşam maliyeti baz alındığında durum <b>{{ durum }}</b> olarak gözüküyor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card" style="text-align: center;">
-            <h3>Tahmini Aylık Maaş</h3>
-            <div class="price" id="sayac">0</div>
-            <p style="margin:0;">Asgari ücretin <strong>{{ oran }}</strong> katı.</p>
+            <label>Tahmini Aylık Maaş</label>
+            <div class="big-price" style="font-size: 50px;" id="main-price">0</div>
+            <p style="font-size: 11px; color:#555;">Coklu Lineer Regresyon modeli tahminidir.</p>
         </div>
 
         <div class="card">
-            <h3>81 İl Karşılaştırması</h3>
+            <h3>81 İlin Maaş Karşılaştırması</h3>
             <div class="bar-chart" id="chart">
-                <div id="city-info"></div>
+                <div id="city-popup"></div>
                 {% for s in sehirler %}
-                <div class="bar {% if s == secilen_sehir %}bar-active{% endif %}" data-city="{{ s }}" style="height: {{ range(20, 100) | random }}px;"></div>
+                <div class="bar {% if s == secilen_sehir %}bar-active{% endif %}" 
+                     data-city="{{ s }}" 
+                     style="height: {{ range(25, 100) | random }}px;"></div>
                 {% endfor %}
             </div>
-            <p style="font-size:11px; color:#666; margin-top:10px;">* Kırmızı sütun seçilen şehri temsil eder. İsmi görmek için barlara dokunun.</p>
+            <p style="font-size: 11px; color:#666; margin-top:10px;">* Barlara dokunarak şehir isimlerini görebilirsiniz.</p>
         </div>
         {% endif %}
 
         <div class="card">
             <h3>Sektör Haberleri</h3>
-            <div class="news-grid">
-                <div class="news-card"><strong>AI Trend:</strong> AI araçlarını kullananların maaşı %40 daha hızlı artıyor.</div>
-                <div class="news-card"><strong>Uzaktan Çalışma:</strong> Şirketlerin %65'i hibrit modele geçti.</div>
-                <div class="news-card"><strong>Siber Güvenlik:</strong> Sektörde büyük bir uzman açığı bekleniyor.</div>
+            <div class="news-container">
+                <div class="news-box"><span class="news-tag">AI Trend</span><br><b>AI Maaşları Artıyor</b><br><small>Yapay zeka uzmanlarına talep %40 arttı.</small></div>
+                <div class="news-box"><span class="news-tag">Sektör Haber</span><br><b>2024 Beklentileri</b><br><small>Bilişimde hibrit model kalıcı hale geliyor.</small></div>
+                <div class="news-box"><span class="news-tag">Teknoloji</span><br><b>Yeni Nesil Diller</b><br><small>Rust ve Go dilleri popülerliğini koruyor.</small></div>
             </div>
         </div>
     </div>
+
     <script>
         {% if tahmin %}
-        new CountUp('sayac', {{ tahmin }}, { separator: '.', decimal: ',', duration: 2 }).start();
+        const countOptions = { separator: '.', decimal: ',', duration: 2 };
+        new CountUp('price1', {{ tahmin }}, countOptions).start();
+        new CountUp('main-price', {{ tahmin }}, countOptions).start();
+
         const bars = document.querySelectorAll('.bar');
-        const info = document.getElementById('city-info');
+        const popup = document.getElementById('city-popup');
         bars.forEach(bar => {
-            bar.addEventListener('click', (e) => {
-                info.innerText = bar.getAttribute('data-city');
-                info.style.display = 'block';
-                info.style.left = (bar.offsetLeft) + 'px';
-                info.style.bottom = (bar.offsetHeight + 10) + 'px';
-                setTimeout(() => { info.style.display = 'none'; }, 2000);
+            bar.addEventListener('click', () => {
+                popup.innerText = bar.getAttribute('data-city');
+                popup.style.display = 'block';
+                popup.style.left = bar.offsetLeft + 'px';
+                popup.style.bottom = (bar.offsetHeight + 15) + 'px';
+                setTimeout(() => popup.style.display = 'none', 2000);
             });
         });
         {% endif %}
