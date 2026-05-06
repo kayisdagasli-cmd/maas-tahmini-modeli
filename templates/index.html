@@ -4,93 +4,172 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maaş Tahmin Modeli</title>
-    <script src="https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"></script>
     <style>
-        :root { --bordo: #800000; --bg: #0b0b0b; --card: #161616; --text: #e0e0e0; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 15px; }
-        .container { max-width: 800px; margin: auto; }
-        .card { background: var(--card); border-radius: 15px; padding: 20px; border-top: 5px solid var(--bordo); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-        input, select { width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; background: var(--bordo); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .price { font-size: 45px; color: #ff4d4d; font-weight: bold; }
-        .bar-chart { display: flex; align-items: flex-end; height: 120px; gap: 2px; background: #000; padding: 10px; border-radius: 10px; overflow-x: auto; position: relative; }
-        .bar { min-width: 8px; background: #400000; height: 20px; transition: 0.3s; cursor: pointer; }
-        .bar-active { background: #ff4d4d; min-width: 12px; height: 70px !important; box-shadow: 0 0 10px #ff4d4d; }
-        #city-tag { position: absolute; background: white; color: black; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: none; z-index: 100; pointer-events: none; }
-        .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        @media (max-width: 600px) { .news-grid { grid-template-columns: 1fr; } }
-        .news-box { background: #222; padding: 12px; border-radius: 10px; border-bottom: 3px solid var(--bordo); }
+        :root {
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --bordo: #800000;
+            --light-bordo: #a00000;
+            --text-main: #e0e0e0;
+            --text-dim: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0; padding: 20px;
+        }
+
+        .container { max-width: 600px; margin: auto; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-top: 4px solid var(--bordo);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { margin-top: 0; font-size: 1.5rem; color: #fff; }
+        p.sub-title { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: var(--text-dim); }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        input:focus { border-color: var(--bordo); outline: none; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: var(--bordo);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover { background: var(--light-bordo); }
+
+        .result-card {
+            text-align: center;
+            border: 1px solid var(--bordo);
+            background: rgba(128, 0, 0, 0.05);
+        }
+
+        .salary-text {
+            font-size: 2.5rem;
+            color: var(--light-bordo);
+            font-weight: 800;
+            display: block;
+        }
+
+        .error { color: #ff4444; font-size: 0.8rem; margin-top: 10px; }
+
+        /* Grafik Placeholder */
+        .chart-mockup {
+            height: 100px;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            margin-top: 15px;
+        }
+        .bar { background: var(--bordo); flex: 1; border-radius: 2px 2px 0 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <h2>Maaş Tahmin Modeli</h2>
-            <form action="/predict" method="post">
-                <div class="grid">
-                    <div><label>Yaş (18-65)</label><input type="number" name="yas" value="{{ yas if yas else 25 }}" min="18" max="65" required></div>
-                    <div><label>Deneyim (Yıl)</label><input type="number" name="deneyim" value="{{ deneyim if deneyim else 3 }}" min="0" max="47" required></div>
-                    <div><label>Eğitim</label><select name="egitim"><option>Lise</option><option selected>Lisans</option><option>Yüksek Lisans</option><option>Doktora</option></select></div>
-                    <div><label>Meslek</label><select name="meslek">{% for m in meslekler %}<option {% if m == meslek %}selected{% endif %}>{{ m }}</option>{% endfor %}</select></div>
+
+<div class="container">
+    <div class="card">
+        <h2>Maaş Tahmin Modeli</h2>
+        <p class="sub-title">81 İl üzerinden 10 farklı meslek grubu için analiz</p>
+        
+        <form method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Yaş (18-65)</label>
+                    <input type="number" name="yas" min="18" max="65" placeholder="25" required>
                 </div>
-                <div style="margin-top:15px;"><label>Şehir</label><select name="sehir">{% for s in sehirler %}<option {% if s == secilen_sehir %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></div>
-                <button type="submit" class="btn">Tahmin Et</button>
-            </form>
-        </div>
-
-        {% if hata %}<div class="card" style="color:#ff4d4d; text-align:center;">{{ hata }}</div>{% endif %}
-
-        {% if tahmin %}
-        <div class="card" style="text-align: center;">
-            <h3>Tahmini Maaş</h3>
-            <div class="price" id="sayac">0</div>
-            <p>Asgari ücretin {{ oran }} katı.</p>
-        </div>
-
-        <div class="card">
-            <h3>81 İl Kıyaslaması</h3>
-            <div class="bar-chart">
-                <div id="city-tag"></div>
-                {% for s in sehirler %}
-                <div class="bar {% if s == secilen_sehir %}bar-active{% endif %}" data-name="{{ s }}" style="height: {{ range(20, 100) | random }}px;"></div>
-                {% endfor %}
-            </div>
-            <small style="color:#666; margin-top:10px; display:block;">* Şehir ismini görmek için barlara dokunun.</small>
-        </div>
-        {% endif %}
-
-        <div class="card">
-            <h3>Güncel Sektör Haberleri</h3>
-            <div class="news-grid">
-                {% for haber in haberler %}
-                <div class="news-box">
-                    <small style="color:var(--bordo); font-weight:bold;">{{ haber.tag }}</small>
-                    <p style="margin:5px 0; font-weight:bold; font-size:14px;">{{ haber.baslik }}</p>
-                    <small style="color:#888;">{{ haber.ozet }}</small>
+                <div class="form-group">
+                    <label>Deneyim (Yıl)</label>
+                    <input type="number" name="deneyim" placeholder="3" required>
                 </div>
-                {% endfor %}
             </div>
-        </div>
+
+            <div class="form-group">
+                <label>Eğitim Durumu</label>
+                <select name="egitim">
+                    {% for e in egitimler %}
+                    <option value="{{ e }}">{{ e }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Meslek</label>
+                <select name="meslek">
+                    {% for m in meslekler %}
+                    <option value="{{ m }}">{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Şehir</label>
+                <select name="sehir">
+                    {% for sehir in iller %}
+                    <option value="{{ sehir }}">{{ sehir }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit">Maaşı Tahmin Et</button>
+            {% if hata %}<p class="error">{{ hata }}</p>{% endif %}
+        </form>
     </div>
 
-    <script>
-        {% if tahmin %}
-        new CountUp('sayac', {{ tahmin }}, { separator: '.', decimal: ',', duration: 2 }).start();
-        
-        const bars = document.querySelectorAll('.bar');
-        const tag = document.getElementById('city-tag');
-        bars.forEach(bar => {
-            bar.addEventListener('click', (e) => {
-                tag.innerText = bar.getAttribute('data-name');
-                tag.style.display = 'block';
-                tag.style.left = (bar.offsetLeft) + 'px';
-                tag.style.bottom = (bar.offsetHeight + 15) + 'px';
-                setTimeout(() => { tag.style.display = 'none'; }, 2000);
-            });
-        });
-        {% endif %}
-    </script>
+    {% if tahmin %}
+    <div class="card result-card">
+        <label>Tahmini Aylık Maaş</label>
+        <span class="salary-text">{{ "{:,.0f}".format(tahmin).replace(',', '.') }} TL</span>
+        <p style="font-size: 0.7rem; color: var(--text-dim);">Analiz: Seçilen kriterlere göre piyasa ortalamasıdır.</p>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h2>Analiz & Kıyaslama</h2>
+        <div class="chart-mockup">
+            <div class="bar" style="height: 40%"></div>
+            <div class="bar" style="height: 60%"></div>
+            <div class="bar" style="height: 30%"></div>
+            <div class="bar" style="height: 80%"></div>
+            <div class="bar" style="height: 50%"></div>
+            <div class="bar" style="height: 90%"></div>
+            <div class="bar" style="height: 45%"></div>
+        </div>
+        <p style="font-size: 0.75rem; text-align: center; margin-top: 10px;">81 İlin Maaş Karşılaştırması</p>
+    </div>
+</div>
+
 </body>
 </html>
