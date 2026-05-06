@@ -1,126 +1,63 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Maaş Tahmin Modeli</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --ana-bordo: #800000;
-            --koyu-kart: #151515;
-            --arka-plan: #0a0a0a;
-            --border-color: #2a2a2a;
+        :root { --bordo: #800000; --koyu: #121212; --bg: #0a0a0a; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 10px; font-size: 0.85rem; }
+        .container { max-width: 440px; margin: auto; }
+        
+        .card { 
+            background: var(--koyu); border: 1px solid #222; border-radius: 14px; 
+            padding: 15px; margin-bottom: 12px; border-top: 3px solid var(--bordo);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        
+        h2 { font-size: 1.1rem; margin: 0 0 5px 0; font-weight: 800; }
+        .sub { color: #777; font-size: 0.65rem; margin-bottom: 10px; }
+        
+        .row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .col { flex: 1; }
+        
+        label { display: block; color: #888; font-size: 0.6rem; margin-bottom: 3px; }
+        input, select { 
+            background: #1a1a1a; border: 1px solid #333; color: #fff; 
+            padding: 8px; border-radius: 6px; width: 100%; font-size: 0.8rem; box-sizing: border-box;
         }
 
-        body {
-            background-color: var(--arka-plan);
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 10px;
+        .btn { 
+            background: var(--bordo); color: #fff; border: none; padding: 12px; 
+            width: 100%; border-radius: 8px; font-weight: bold; margin-top: 10px; font-size: 0.85rem;
         }
 
-        .container { max-width: 480px; margin: auto; }
+        /* Analiz Grid */
+        .a-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .s-box { background: #181818; padding: 10px; border-radius: 8px; border-left: 2px solid var(--bordo); }
+        .val { color: var(--bordo); font-size: 1rem; font-weight: 800; }
 
-        /* Ana Kartlar */
-        .card {
-            background-color: var(--koyu-kart);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
+        /* Grafik Kaydırmalı Yapı */
+        .chart-scroll { 
+            overflow-x: auto; white-space: nowrap; padding-bottom: 15px; 
+            scrollbar-color: var(--bordo) #222; scrollbar-width: thin;
+        }
+        .chart-wrap { display: inline-flex; align-items: flex-end; gap: 4px; height: 120px; padding-left: 5px; }
+        .bar-cont { display: flex; flex-direction: column; align-items: center; width: 35px; }
+        .bar { width: 15px; background: var(--bordo); opacity: 0.4; border-radius: 2px; }
+        .bar.active { opacity: 1; background: #ff0000; box-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        .city-label { font-size: 0.5rem; color: #666; margin-top: 5px; transform: rotate(-45deg); height: 25px; }
+
+        /* Haberler */
+        .news-row { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0; }
+        .news-card { 
+            min-width: 110px; background: #1a1a1a; border: 1px solid #222; 
+            border-radius: 8px; padding: 10px; border-bottom: 2px solid var(--bordo);
         }
 
-        .card::before { /* Üstteki bordo çizgi */
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--ana-bordo);
-        }
-
-        h2 { font-size: 1.3rem; margin: 0 0 5px 0; }
-        .sub-text { color: #888; font-size: 0.75rem; margin-bottom: 15px; }
-
-        /* Inputlar */
-        .flex-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .input-group { flex: 1; }
-        label { display: block; color: #aaa; font-size: 0.7rem; margin-bottom: 4px; }
-        input, select {
-            background: #1e1e1e;
-            border: 1px solid #333;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            width: 100%;
-            box-sizing: border-box;
-            font-size: 0.9rem;
-        }
-
-        .btn-tahmin {
-            background: var(--ana-bordo);
-            color: white;
-            border: none;
-            padding: 14px;
-            width: 100%;
-            border-radius: 8px;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-
-        /* Analiz Bölümü - Görseldeki gibi 2'li yapı */
-        .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .small-card { 
-            background: #1e1e1e; 
-            padding: 12px; 
-            border-radius: 10px; 
-            border-left: 3px solid var(--ana-bordo);
-        }
-
-        .price-tag { color: var(--ana-bordo); font-size: 1.2rem; font-weight: 800; }
-
-        /* Grafik Bar Alanı */
-        .chart-box { height: 120px; display: flex; align-items: flex-end; gap: 3px; margin-top: 10px; }
-        .bar { background: var(--ana-bordo); flex: 1; border-radius: 2px 2px 0 0; opacity: 0.6; transition: 0.3s; }
-        .bar.active { background: #ff1a1a; opacity: 1; }
-
-        /* Haber Kartları */
-        .news-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .news-card {
-            min-width: 140px;
-            height: 100px;
-            background: linear-gradient(to bottom, transparent, #000), url('https://via.placeholder.com/150x100');
-            background-size: cover;
-            border-radius: 10px;
-            padding: 10px;
-            display: flex;
-            align-items: flex-end;
-            font-size: 0.7rem;
-            border: 1px solid #333;
-        }
-
-        /* Gauge (Yüzde) Alanı */
-        .gauge-container { text-align: center; margin: 10px 0; }
-        .gauge-circle {
-            width: 80px; height: 40px;
-            border: 6px solid #333;
-            border-bottom: none;
-            border-radius: 80px 80px 0 0;
-            margin: auto;
-            position: relative;
-        }
-        .gauge-fill {
-            position: absolute; top: 0; left: 0;
-            width: 80px; height: 40px;
-            border: 6px solid var(--ana-bordo);
-            border-bottom: none;
-            border-radius: 80px 80px 0 0;
-            transform: rotate(45deg); /* Yüzdeye göre değişir */
-        }
+        .res-card { text-align: center; border: 2px solid var(--bordo); background: rgba(128,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -128,95 +65,87 @@
 <div class="container">
     <div class="card">
         <h2>Maaş Tahmin Modeli</h2>
-        <p class="sub-text">Bilişim sektörü için 81 İl üzerinden maaş analizi</p>
+        <p class="sub">81 İl, 10 Meslek Grubu Analizi</p>
         <form method="POST">
-            <div class="flex-row">
-                <div class="input-group">
-                    <label>Yaş</label>
-                    <input type="number" name="yas" value="25">
+            <div class="row">
+                <div class="col"><label>Yaş (18-65)</label><input type="number" name="yas" value="{{ request.form.get('yas', '25') }}" min="18" max="65"></div>
+                <div class="col"><label>Deneyim</label><input type="number" name="deneyim" value="{{ request.form.get('deneyim', '3') }}"></div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Eğitim</label>
+                    <select name="egitim">
+                        {% for e in ["Lise", "Lisans", "Yüksek Lisans", "Doktora"] %}
+                        <option value="{{e}}" {% if request.form.get('egitim')==e %}selected{% endif %}>{{e}}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div class="input-group">
-                    <label>Deneyim (Yıl)</label>
-                    <input type="number" name="deneyim" value="3">
+                <div class="col">
+                    <label>Meslek</label>
+                    <select name="meslek">
+                        {% for m in meslekler %}<option value="{{m}}" {% if request.form.get('meslek')==m %}selected{% endif %}>{{m}}</option>{% endfor %}
+                    </select>
                 </div>
             </div>
-            <label>Eğitim Durumu</label>
-            <select name="egitim"><option>Lisans</option></select>
-            <label>Meslek</label>
-            <select name="meslek"><option>Yazılım Geliştirici</option></select>
             <label>Şehir</label>
-            <select name="sehir" id="sehirSelect" onchange="updateChart()">
-                {% for s in iller %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+            <select name="sehir">
+                {% for s in iller %}<option value="{{s}}" {% if request.form.get('sehir')==s %}selected{% endif %}>{{s}}</option>{% endfor %}
             </select>
-            <button class="btn-tahmin">Maaşı Tahmin Et</button>
+            <button class="btn">Maaşı Tahmin Et</button>
         </form>
+    </div>
+
+    {% if tahmin %}
+    <div class="card res-card">
+        <label>Tahmini Aylık Maaş</label>
+        <div style="font-size: 1.8rem; font-weight: 800; color: #ff1a1a;">{{ "{:,.0f}".format(tahmin).replace(',', '.') }} TL</div>
+        <p style="font-size: 0.55rem; color: #555;">Veriler piyasa ortalamasıdır.</p>
     </div>
 
     <div class="card">
         <h2>Analiz & Kıyaslama</h2>
-        <div class="analysis-grid">
-            <div class="small-card">
+        <div class="a-grid">
+            <div class="s-box">
                 <label>Asgari Ücret Kıyas</label>
-                <div class="price-tag">71.200 TL</div>
-                <div class="gauge-container">
-                    <div class="gauge-circle"><div class="gauge-fill"></div></div>
-                    <span style="font-size: 0.6rem;">4.2 Katıdır</span>
-                </div>
+                <div class="val">{{asgari_kati}} Katı</div>
+                <div style="font-size: 0.6rem; color: #666; margin-top: 5px;">(17.002 TL bazlı)</div>
             </div>
-            <div class="small-card">
-                <label>En Yüksek Şehir</label>
-                <div style="font-size: 0.8rem;">İstanbul: ~85.000 TL</div>
-                <hr style="border: 0.1px solid #333; margin: 8px 0;">
+            <div class="s-box">
                 <label>Geçim Endeksi</label>
-                <div style="font-size: 0.8rem; color: #44ff44;">Skor: 78/100, Yeterli</div>
+                <div style="font-size: 0.7rem; color: #00ff00;">Skor: 78/100, Yeterli</div>
+                <label style="margin-top:5px;">En Yüksek Şehir</label>
+                <div style="font-size: 0.65rem;">İstanbul: ~85k</div>
             </div>
         </div>
-    </div>
-
-    {% if tahmin %}
-    <div class="card" style="text-align: center; border: 2px solid var(--ana-bordo);">
-        <label>Tahmini Aylık Maaş</label>
-        <div style="font-size: 2.2rem; font-weight: 800; color: var(--ana-bordo);">{{ tahmin }} TL</div>
-        <p style="font-size: 0.6rem; color: #555;">Coklu Lineer Regresyon modeli tahminidir.</p>
     </div>
     {% endif %}
 
     <div class="card">
-        <h2>81 İlin Maaş Karşılaştırması</h2>
-        <div class="chart-box" id="chartBox">
+        <h2>81 İlin Karşılaştırması</h2>
+        <div class="chart-scroll">
+            <div class="chart-wrap">
+                {% for s in iller %}
+                <div class="bar-cont">
+                    <div class="bar {% if s == request.form.get('sehir') %}active{% endif %}" 
+                         style="height: {{ range(30, 95)|random }}%;"></div>
+                    <span class="city-label">{{s}}</span>
+                </div>
+                {% endfor %}
             </div>
+        </div>
     </div>
 
     <div class="card">
         <h2>Sektör Haberleri</h2>
-        <div class="news-scroll">
-            <div class="news-card">AI Maaşları Artıyor</div>
-            <div class="news-card">2024 Beklentileri</div>
-            <div class="news-card">Kripto Mühendisliği</div>
+        <div class="news-row">
+            {% for haber in haberler %}
+            <div class="news-card">
+                <label>{{haber.kategori}}</label>
+                <div style="font-size: 0.7rem; font-weight: bold; margin-top: 5px;">{{haber.baslik}}</div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
-
-<script>
-    // Grafik Barlarını Oluşturma
-    const chartBox = document.getElementById('chartBox');
-    for(let i=0; i<30; i++) {
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        bar.style.height = Math.floor(Math.random() * 80 + 20) + '%';
-        bar.onclick = function() {
-            alert("Şehir Verisi: " + (Math.random()*20 + 40).toFixed(3) + " TL");
-        };
-        chartBox.appendChild(bar);
-    }
-
-    function updateChart() {
-        const bars = document.querySelectorAll('.bar');
-        bars.forEach(b => b.classList.remove('active'));
-        const randomBar = bars[Math.floor(Math.random() * bars.length)];
-        randomBar.classList.add('active');
-    }
-</script>
-
 </body>
 </html>
