@@ -4,97 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maaş Tahmin Modeli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --dark-bg: #0f0f0f;
-            --card-bg: #1a1a1a;
-            --bordo: #800000;
-            --light-bordo: #a00000;
-            --text-main: #e0e0e0;
-            --text-dim: #a0a0a0;
+            --ana-bordo: #800000;
+            --koyu-kart: #151515;
+            --arka-plan: #0a0a0a;
+            --border-color: #2a2a2a;
         }
 
         body {
-            background-color: var(--dark-bg);
-            color: var(--text-main);
+            background-color: var(--arka-plan);
+            color: #ffffff;
             font-family: 'Inter', sans-serif;
-            margin: 0; padding: 20px;
+            margin: 0;
+            padding: 10px;
         }
 
-        .container { max-width: 600px; margin: auto; }
+        .container { max-width: 480px; margin: auto; }
 
+        /* Ana Kartlar */
         .card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border-top: 4px solid var(--bordo);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background-color: var(--koyu-kart);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
         }
 
-        h2 { margin-top: 0; font-size: 1.5rem; color: #fff; }
-        p.sub-title { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px; }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .card::before { /* Üstteki bordo çizgi */
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--ana-bordo);
         }
 
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: var(--text-dim); }
+        h2 { font-size: 1.3rem; margin: 0 0 5px 0; }
+        .sub-text { color: #888; font-size: 0.75rem; margin-bottom: 15px; }
 
+        /* Inputlar */
+        .flex-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .input-group { flex: 1; }
+        label { display: block; color: #aaa; font-size: 0.7rem; margin-bottom: 4px; }
         input, select {
-            width: 100%;
-            padding: 12px;
-            background: #252525;
+            background: #1e1e1e;
             border: 1px solid #333;
-            border-radius: 8px;
             color: white;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
             box-sizing: border-box;
+            font-size: 0.9rem;
         }
 
-        input:focus { border-color: var(--bordo); outline: none; }
-
-        .btn-submit {
-            width: 100%;
-            padding: 15px;
-            background: var(--bordo);
+        .btn-tahmin {
+            background: var(--ana-bordo);
             color: white;
             border: none;
+            padding: 14px;
+            width: 100%;
             border-radius: 8px;
             font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-
-        .btn-submit:hover { background: var(--light-bordo); }
-
-        .result-card {
-            text-align: center;
-            border: 1px solid var(--bordo);
-            background: rgba(128, 0, 0, 0.05);
-        }
-
-        .salary-text {
-            font-size: 2.5rem;
-            color: var(--light-bordo);
-            font-weight: 800;
-            display: block;
-        }
-
-        .error { color: #ff4444; font-size: 0.8rem; margin-top: 10px; }
-
-        /* Grafik Placeholder */
-        .chart-mockup {
-            height: 100px;
-            display: flex;
-            align-items: flex-end;
-            gap: 4px;
             margin-top: 15px;
         }
-        .bar { background: var(--bordo); flex: 1; border-radius: 2px 2px 0 0; }
+
+        /* Analiz Bölümü - Görseldeki gibi 2'li yapı */
+        .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .small-card { 
+            background: #1e1e1e; 
+            padding: 12px; 
+            border-radius: 10px; 
+            border-left: 3px solid var(--ana-bordo);
+        }
+
+        .price-tag { color: var(--ana-bordo); font-size: 1.2rem; font-weight: 800; }
+
+        /* Grafik Bar Alanı */
+        .chart-box { height: 120px; display: flex; align-items: flex-end; gap: 3px; margin-top: 10px; }
+        .bar { background: var(--ana-bordo); flex: 1; border-radius: 2px 2px 0 0; opacity: 0.6; transition: 0.3s; }
+        .bar.active { background: #ff1a1a; opacity: 1; }
+
+        /* Haber Kartları */
+        .news-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .news-card {
+            min-width: 140px;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, #000), url('https://via.placeholder.com/150x100');
+            background-size: cover;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            align-items: flex-end;
+            font-size: 0.7rem;
+            border: 1px solid #333;
+        }
+
+        /* Gauge (Yüzde) Alanı */
+        .gauge-container { text-align: center; margin: 10px 0; }
+        .gauge-circle {
+            width: 80px; height: 40px;
+            border: 6px solid #333;
+            border-bottom: none;
+            border-radius: 80px 80px 0 0;
+            margin: auto;
+            position: relative;
+        }
+        .gauge-fill {
+            position: absolute; top: 0; left: 0;
+            width: 80px; height: 40px;
+            border: 6px solid var(--ana-bordo);
+            border-bottom: none;
+            border-radius: 80px 80px 0 0;
+            transform: rotate(45deg); /* Yüzdeye göre değişir */
+        }
     </style>
 </head>
 <body>
@@ -102,74 +128,95 @@
 <div class="container">
     <div class="card">
         <h2>Maaş Tahmin Modeli</h2>
-        <p class="sub-title">81 İl üzerinden 10 farklı meslek grubu için analiz</p>
-        
+        <p class="sub-text">Bilişim sektörü için 81 İl üzerinden maaş analizi</p>
         <form method="POST">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Yaş (18-65)</label>
-                    <input type="number" name="yas" min="18" max="65" placeholder="25" required>
+            <div class="flex-row">
+                <div class="input-group">
+                    <label>Yaş</label>
+                    <input type="number" name="yas" value="25">
                 </div>
-                <div class="form-group">
+                <div class="input-group">
                     <label>Deneyim (Yıl)</label>
-                    <input type="number" name="deneyim" placeholder="3" required>
+                    <input type="number" name="deneyim" value="3">
                 </div>
             </div>
-
-            <div class="form-group">
-                <label>Eğitim Durumu</label>
-                <select name="egitim">
-                    {% for e in egitimler %}
-                    <option value="{{ e }}">{{ e }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Meslek</label>
-                <select name="meslek">
-                    {% for m in meslekler %}
-                    <option value="{{ m }}">{{ m }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Şehir</label>
-                <select name="sehir">
-                    {% for sehir in iller %}
-                    <option value="{{ sehir }}">{{ sehir }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <button type="submit" class="btn-submit">Maaşı Tahmin Et</button>
-            {% if hata %}<p class="error">{{ hata }}</p>{% endif %}
+            <label>Eğitim Durumu</label>
+            <select name="egitim"><option>Lisans</option></select>
+            <label>Meslek</label>
+            <select name="meslek"><option>Yazılım Geliştirici</option></select>
+            <label>Şehir</label>
+            <select name="sehir" id="sehirSelect" onchange="updateChart()">
+                {% for s in iller %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+            </select>
+            <button class="btn-tahmin">Maaşı Tahmin Et</button>
         </form>
     </div>
 
+    <div class="card">
+        <h2>Analiz & Kıyaslama</h2>
+        <div class="analysis-grid">
+            <div class="small-card">
+                <label>Asgari Ücret Kıyas</label>
+                <div class="price-tag">71.200 TL</div>
+                <div class="gauge-container">
+                    <div class="gauge-circle"><div class="gauge-fill"></div></div>
+                    <span style="font-size: 0.6rem;">4.2 Katıdır</span>
+                </div>
+            </div>
+            <div class="small-card">
+                <label>En Yüksek Şehir</label>
+                <div style="font-size: 0.8rem;">İstanbul: ~85.000 TL</div>
+                <hr style="border: 0.1px solid #333; margin: 8px 0;">
+                <label>Geçim Endeksi</label>
+                <div style="font-size: 0.8rem; color: #44ff44;">Skor: 78/100, Yeterli</div>
+            </div>
+        </div>
+    </div>
+
     {% if tahmin %}
-    <div class="card result-card">
+    <div class="card" style="text-align: center; border: 2px solid var(--ana-bordo);">
         <label>Tahmini Aylık Maaş</label>
-        <span class="salary-text">{{ "{:,.0f}".format(tahmin).replace(',', '.') }} TL</span>
-        <p style="font-size: 0.7rem; color: var(--text-dim);">Analiz: Seçilen kriterlere göre piyasa ortalamasıdır.</p>
+        <div style="font-size: 2.2rem; font-weight: 800; color: var(--ana-bordo);">{{ tahmin }} TL</div>
+        <p style="font-size: 0.6rem; color: #555;">Coklu Lineer Regresyon modeli tahminidir.</p>
     </div>
     {% endif %}
 
     <div class="card">
-        <h2>Analiz & Kıyaslama</h2>
-        <div class="chart-mockup">
-            <div class="bar" style="height: 40%"></div>
-            <div class="bar" style="height: 60%"></div>
-            <div class="bar" style="height: 30%"></div>
-            <div class="bar" style="height: 80%"></div>
-            <div class="bar" style="height: 50%"></div>
-            <div class="bar" style="height: 90%"></div>
-            <div class="bar" style="height: 45%"></div>
+        <h2>81 İlin Maaş Karşılaştırması</h2>
+        <div class="chart-box" id="chartBox">
+            </div>
+    </div>
+
+    <div class="card">
+        <h2>Sektör Haberleri</h2>
+        <div class="news-scroll">
+            <div class="news-card">AI Maaşları Artıyor</div>
+            <div class="news-card">2024 Beklentileri</div>
+            <div class="news-card">Kripto Mühendisliği</div>
         </div>
-        <p style="font-size: 0.75rem; text-align: center; margin-top: 10px;">81 İlin Maaş Karşılaştırması</p>
     </div>
 </div>
+
+<script>
+    // Grafik Barlarını Oluşturma
+    const chartBox = document.getElementById('chartBox');
+    for(let i=0; i<30; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        bar.style.height = Math.floor(Math.random() * 80 + 20) + '%';
+        bar.onclick = function() {
+            alert("Şehir Verisi: " + (Math.random()*20 + 40).toFixed(3) + " TL");
+        };
+        chartBox.appendChild(bar);
+    }
+
+    function updateChart() {
+        const bars = document.querySelectorAll('.bar');
+        bars.forEach(b => b.classList.remove('active'));
+        const randomBar = bars[Math.floor(Math.random() * bars.length)];
+        randomBar.classList.add('active');
+    }
+</script>
 
 </body>
 </html>
