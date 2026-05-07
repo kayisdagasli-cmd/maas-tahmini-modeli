@@ -7,11 +7,10 @@ sehirler = ["Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara"
 
 meslekler = ["Yazılım Mimarı", "Yapay Zeka Uzmanı", "Siber Güvenlik Uzmanı", "Veri Analisti", "DevOps Uzmanı", "Oyun Geliştirici", "Full Stack Developer", "Mobil Uygulama Geliştirici", "Bulut Sistem Mühendisi", "Veri Bilimci"]
 
-# Haber havuzunu genişlettim ki her seferinde farklı gelsin
 haber_havuzu = [
-    {"tag": "1 Sektör News!", "baslik": "AI Maaşları Artıyor", "ozet": "2025'te yapay zeka bilen yazılımcıların maaşı %40 daha yüksek."},
-    {"tag": "1 Sektör News!", "baslik": "Yazılım Sektörü 2024", "ozet": "Hibrit çalışma modeli artık kalıcı hale geliyor."},
-    {"tag": "3 Sektör News!", "baslik": "Kripto Mühendisleri", "ozet": "Blockchain tabanlı projelerde uzman açığı büyüyor."},
+    {"tag": "Sektör News!", "baslik": "AI Maaşları Artıyor", "ozet": "2025'te yapay zeka bilen yazılımcıların maaşı %40 daha yüksek."},
+    {"tag": "Sektör News!", "baslik": "Yazılım Sektörü 2024", "ozet": "Hibrit çalışma modeli artık kalıcı hale geliyor."},
+    {"tag": "Sektör News!", "baslik": "Kripto Mühendisleri", "ozet": "Blockchain tabanlı projelerde uzman açığı büyüyor."},
     {"tag": "Trend", "baslik": "Siber Güvenlik", "ozet": "Güvenlik uzmanları en çok aranan ilk 3 meslekte."},
     {"tag": "Ekonomi", "baslik": "Global Remote", "ozet": "Yurt dışı kaynaklı işlerde dolar bazlı artış sürüyor."},
     {"tag": "Girişim", "baslik": "Yeni Unicornlar", "ozet": "Türkiye oyun ve fintech alanında yatırım rekoru kırdı."}
@@ -24,29 +23,49 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        yas = int(request.form.get('yas', 25))
-        deneyim = int(request.form.get('deneyim', 3))
-        egitim = request.form.get('egitim')
-        meslek = request.form.get('meslek')
-        secilen_sehir = request.form.get('sehir')
+        # Formdan verileri alırken varsayılan değerler atayarak 0 hatasını önlüyoruz
+        yas = int(request.form.get('yas', 18))
+        deneyim = int(request.form.get('deneyim', 0))
+        egitim = request.form.get('egitim', 'Lisans')
+        meslek = request.form.get('meslek', 'Veri Analisti')
+        secilen_sehir = request.form.get('sehir', 'İstanbul')
 
-        # Yaş-Deneyim Kontrolü
+        # 1. Kontrol: Yaş Sınırı (18-65)
+        if yas < 18 or yas > 65:
+            return render_template('index.html', sehirler=sehirler, meslekler=meslekler, hata="Lütfen 18-65 yaş arası bir değer girin.")
+
+        # 2. Kontrol: Yaş-Deneyim İlişkisi
+        # Bir kişi en erken 18 yaşında tam zamanlı çalışmaya başladığını varsayarsak
         if deneyim > (yas - 18):
-            return render_template('index.html', sehirler=sehirler, meslekler=meslekler, hata="Yaş ve deneyim tutarsız!")
+            return render_template('index.html', sehirler=sehirler, meslekler=meslekler, hata=f"{yas} yaşındaki biri için en fazla {yas-18} yıl deneyim girilebilir.")
 
-        # Net Hesaplama (0 hatasını önlemek için)
-        baz = 28000
-        egitim_bonus = {"Lise": 0.8, "Lisans": 1.0, "Yüksek Lisans": 1.3, "Doktora": 1.6}
-        hesap = (baz * egitim_bonus.get(egitim, 1.0)) + (deneyim * 9200)
+        # Maaş Hesaplama Mantığı (0 çıkmaması için baz değerler)
+        asgari_ucret = 17002
+        baz_maas = 25000  # Sektörel başlangıç bazı
         
-        if "Mimarı" in meslek or "Zeka" in meslek: hesap += 15000
-        if secilen_sehir == "İstanbul": hesap *= 1.3
+        egitim_katsayi = {"Lise": 0.8, "Lisans": 1.0, "Yüksek Lisans": 1.25, "Doktora": 1.5}
+        katsayi = egitim_katsayi.get(egitim, 1.0)
+        
+        # Hesaplama: Baz * Eğitim + (Deneyim * Sabit Artış)
+        hesap = (baz_maas * katsayi) + (deneyim * 8500)
+        
+        # Meslek bazlı eklemeler
+        if any(keyword in meslek for keyword in ["Mimarı", "Zeka", "Siber", "DevOps"]):
+            hesap += 12000
+            
+        # Şehir bazlı çarpan
+        if secilen_sehir in ["İstanbul", "Ankara", "İzmir"]:
+            hesap *= 1.2
 
-        oran = round(hesap / 17002, 1)
-        secilen_haberler = random.sample(haber_havuzu, 3) # Haberleri rastgele seç
+        oran = round(hesap / asgari_ucret, 1)
+        secilen_haberler = random.sample(haber_havuzu, 3)
 
         return render_template('index.html', tahmin=int(hesap), sehirler=sehirler, meslekler=meslekler, 
                              oran=oran, secilen_sehir=secilen_sehir, yas=yas, deneyim=deneyim,
                              haberler=secilen_haberler)
-    except:
-        return render_template('index.html', sehirler=sehirler, meslekler=meslekler)
+    except Exception as e:
+        print(f"Hata oluştu: {e}")
+        return render_template('index.html', sehirler=sehirler, meslekler=meslekler, hata="Bir hata oluştu, lütfen tekrar deneyin.")
+
+if __name__ == '__main__':
+    app.run(debug=True)
