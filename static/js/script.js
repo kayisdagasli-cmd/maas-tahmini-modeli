@@ -1,33 +1,36 @@
-window.addEventListener('DOMContentLoaded', () => {
+window.onload = function () {
 
-    // YAŞ - DENEYİM KONTROLÜ
-    const yasInput = document.getElementById('yasInput');
-    const deneyimInput = document.getElementById('deneyimInput');
+    // YAŞ - DENEYİM
+    const yasInput =
+        document.getElementById("yasInput");
+
+    const deneyimInput =
+        document.getElementById("deneyimInput");
 
     function updateMaxDeneyim() {
 
         if (!yasInput || !deneyimInput) return;
 
-        const yas = parseInt(yasInput.value) || 18;
+        const yas =
+            parseInt(yasInput.value) || 18;
+
         const maxDeneyim = yas - 18;
 
-        deneyimInput.max = maxDeneyim > 0
-            ? maxDeneyim
-            : 0;
+        deneyimInput.max = maxDeneyim;
 
-        if (parseInt(deneyimInput.value) > maxDeneyim) {
+        if (
+            parseInt(deneyimInput.value)
+            > maxDeneyim
+        ) {
 
-            deneyimInput.value =
-                maxDeneyim > 0
-                ? maxDeneyim
-                : 0;
+            deneyimInput.value = maxDeneyim;
         }
     }
 
     if (yasInput && deneyimInput) {
 
         yasInput.addEventListener(
-            'input',
+            "input",
             updateMaxDeneyim
         );
 
@@ -35,58 +38,25 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // MAAŞ ANİMASYONU
-const maasElement =
-    document.getElementById('sayac_ana');
-
-if (maasElement) {
-
-    const value =
-        maasElement.dataset.value;
-
-    const targetValue =
-        parseInt(value);
-
-    if (!isNaN(targetValue)) {
-
-        maasElement.innerHTML = "";
-
-        const countUp = new CountUp(
-            'sayac_ana',
-            targetValue,
-            {
-                separator: '.',
-                duration: 2,
-                suffix: ' ₺'
-            }
-        );
-
-        countUp.start();
-    }
-}
     // GAUGE
     const gauge =
-        document.getElementById('gauge_move');
+        document.getElementById("gauge_move");
 
     if (gauge) {
 
         const oran =
             parseFloat(
-                gauge.getAttribute('data-oran')
+                gauge.dataset.oran
             );
 
-        setTimeout(() => {
+        let deg = (oran * 18) - 45;
 
-            let deg = (oran * 18) - 45;
+        if (deg > 135) {
+            deg = 135;
+        }
 
-            if (deg > 135) {
-                deg = 135;
-            }
-
-            gauge.style.transform =
-                `rotate(${deg}deg)`;
-
-        }, 500);
+        gauge.style.transform =
+            `rotate(${deg}deg)`;
     }
 
-});
+};
