@@ -1,6 +1,3 @@
-# templates/index.html
-
-```html
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -15,6 +12,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"></script>
 </head>
+
 <body>
 
 <div class="overlay"></div>
@@ -28,7 +26,9 @@
     {% endif %}
 
     <div class="card hero-card">
+
         <h1>Maaş Tahmin Sistemi</h1>
+
         <p class="subtitle">
             81 il için gelişmiş maaş analiz sistemi
         </p>
@@ -39,9 +39,10 @@
 
                 <div class="input-group">
                     <label>Yaş</label>
-                    <input 
-                        type="number" 
-                        name="yas" 
+
+                    <input
+                        type="number"
+                        name="yas"
                         id="yasInput"
                         min="18"
                         max="65"
@@ -52,9 +53,10 @@
 
                 <div class="input-group">
                     <label>Deneyim (Yıl)</label>
-                    <input 
-                        type="number" 
-                        name="deneyim" 
+
+                    <input
+                        type="number"
+                        name="deneyim"
                         id="deneyimInput"
                         min="0"
                         value="{{ deneyim if deneyim else 0 }}"
@@ -64,32 +66,64 @@
 
                 <div class="input-group">
                     <label>Eğitim</label>
+
                     <select name="egitim">
-                        <option {% if egitim == 'Lise' %}selected{% endif %}>Lise</option>
-                        <option {% if not egitim or egitim == 'Lisans' %}selected{% endif %}>Lisans</option>
-                        <option {% if egitim == 'Yüksek Lisans' %}selected{% endif %}>Yüksek Lisans</option>
-                        <option {% if egitim == 'Doktora' %}selected{% endif %}>Doktora</option>
+
+                        <option {% if egitim == 'Lise' %}selected{% endif %}>
+                            Lise
+                        </option>
+
+                        <option {% if not egitim or egitim == 'Lisans' %}selected{% endif %}>
+                            Lisans
+                        </option>
+
+                        <option {% if egitim == 'Yüksek Lisans' %}selected{% endif %}>
+                            Yüksek Lisans
+                        </option>
+
+                        <option {% if egitim == 'Doktora' %}selected{% endif %}>
+                            Doktora
+                        </option>
+
                     </select>
                 </div>
 
                 <div class="input-group">
+
                     <label>Meslek</label>
+
                     <select name="meslek">
+
                         {% for m in meslekler %}
-                        <option {% if m == meslek %}selected{% endif %}>{{ m }}</option>
+
+                        <option {% if m == meslek %}selected{% endif %}>
+                            {{ m }}
+                        </option>
+
                         {% endfor %}
+
                     </select>
+
                 </div>
 
             </div>
 
             <div class="input-group city-group">
+
                 <label>Şehir</label>
+
                 <select name="sehir">
+
                     {% for s in sehirler %}
-                    <option {% if s == secilen_sehir %}selected{% endif %}>{{ s }}</option>
+
+                    <option {% if s == secilen_sehir %}selected{% endif %}>
+                        {{ s }}
+                    </option>
+
                     {% endfor %}
+
                 </select>
+
             </div>
 
             <button type="submit" class="btn">
@@ -97,6 +131,7 @@
             </button>
 
         </form>
+
     </div>
 
 
@@ -104,9 +139,15 @@
 
     <div class="card result-card">
 
-        <p class="result-label">Tahmini Maaş</p>
+        <p class="result-label">
+            Tahmini Maaş
+        </p>
 
-        <div class="price-text" id="sayac_ana">
+        <div
+            class="price-text"
+            id="sayac_ana"
+            data-value="{{ tahmin }}"
+        >
             0
         </div>
 
@@ -115,34 +156,49 @@
         </p>
 
         <div class="gauge-wrap">
+
             <div class="gauge-bg"></div>
-            <div class="gauge-fill" id="gauge_move"></div>
+
+            <div
+                class="gauge-fill"
+                id="gauge_move"
+                data-oran="{{ oran }}"
+            ></div>
+
         </div>
 
     </div>
 
 
     <div class="card">
+
         <div class="section-top">
             <h2>81 İl Maaş Kıyaslaması</h2>
         </div>
 
         <div class="bar-chart">
+
             {% for s in sehirler %}
 
             <div class="bar-wrapper">
-                <div 
+
+                <div
                     class="bar {% if s == secilen_sehir %}bar-active{% endif %}"
                     style="height: {{ range(30, 140) | random }}px;"
                 ></div>
 
-                <span class="city-name {% if s == secilen_sehir %}city-active{% endif %}">
+                <span
+                    class="city-name {% if s == secilen_sehir %}city-active{% endif %}"
+                >
                     {{ s }}
                 </span>
+
             </div>
 
             {% endfor %}
+
         </div>
+
     </div>
 
     {% endif %}
@@ -159,6 +215,7 @@
             {% for h in haberler %}
 
             <div class="news-box">
+
                 <div class="news-tag">
                     {{ h.tag }}
                 </div>
@@ -170,6 +227,7 @@
                 <small>
                     {{ h.ozet }}
                 </small>
+
             </div>
 
             {% endfor %}
@@ -186,59 +244,7 @@
 
 </div>
 
-<script>
-
-const yasInput = document.getElementById('yasInput');
-const deneyimInput = document.getElementById('deneyimInput');
-
-function updateMaxDeneyim() {
-
-    const yas = parseInt(yasInput.value);
-    const maxDeneyim = yas - 18;
-
-    deneyimInput.max = maxDeneyim > 0 ? maxDeneyim : 0;
-
-    if (parseInt(deneyimInput.value) > maxDeneyim) {
-        deneyimInput.value = maxDeneyim > 0 ? maxDeneyim : 0;
-    }
-}
-
-if (yasInput && deneyimInput) {
-    yasInput.addEventListener('input', updateMaxDeneyim);
-    updateMaxDeneyim();
-}
-
-{% if tahmin and tahmin > 0 %}
-
-const targetValue = {{ tahmin }};
-
-const countUp = new CountUp('sayac_ana', targetValue, {
-    separator: '.',
-    decimal: ',',
-    duration: 2.5,
-    suffix: ' ₺'
-});
-
-if (!countUp.error) {
-    countUp.start();
-}
-
-setTimeout(() => {
-
-    let deg = ({{ oran }} * 18) - 45;
-
-    if (deg > 135) {
-        deg = 135;
-    }
-
-    document.getElementById('gauge_move').style.transform = `rotate(${deg}deg)`;
-
-}, 400);
-
-{% endif %}
-
-</script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>
 </html>
-```
