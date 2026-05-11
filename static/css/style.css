@@ -1,1 +1,562 @@
+# templates/index.html
+
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Maaş Tahmin Modeli</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"></script>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="container">
+
+    {% if hata %}
+    <div class="error-msg">
+        {{ hata }}
+    </div>
+    {% endif %}
+
+    <div class="card hero-card">
+        <h1>Maaş Tahmin Sistemi</h1>
+        <p class="subtitle">
+            81 il için gelişmiş maaş analiz sistemi
+        </p>
+
+        <form action="/predict" method="post" id="salaryForm">
+
+            <div class="grid">
+
+                <div class="input-group">
+                    <label>Yaş</label>
+                    <input
+                        type="number"
+                        name="yas"
+                        id="yasInput"
+                        min="18"
+                        max="65"
+                        value="{{ yas if yas else 25 }}"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label>Deneyim (Yıl)</label>
+                    <input
+                        type="number"
+                        name="deneyim"
+                        id="deneyimInput"
+                        min="0"
+                        value="{{ deneyim if deneyim else 0 }}"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label>Eğitim</label>
+                    <select name="egitim">
+                        <option {% if egitim == 'Lise' %}selected{% endif %}>Lise</option>
+                        <option {% if not egitim or egitim == 'Lisans' %}selected{% endif %}>Lisans</option>
+                        <option {% if egitim == 'Yüksek Lisans' %}selected{% endif %}>Yüksek Lisans</option>
+                        <option {% if egitim == 'Doktora' %}selected{% endif %}>Doktora</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Meslek</label>
+                    <select name="meslek">
+                        {% for m in meslekler %}
+                        <option {% if m == meslek %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="input-group city-group">
+                <label>Şehir</label>
+                <select name="sehir">
+                    {% for s in sehirler %}
+                    <option {% if s == secilen_sehir %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn">
+                Maaşı Tahmin Et
+            </button>
+
+        </form>
+    </div>
+
+
+    {% if tahmin and tahmin > 0 %}
+
+    <div class="card result-card">
+
+        <p class="result-label">Tahmini Maaş</p>
+
+        <div class="price-text" id="sayac_ana">
+            0
+        </div>
+
+        <p class="oran-text">
+            Asgari ücretin <span>{{ oran }}</span> katı
+        </p>
+
+        <div class="gauge-wrap">
+            <div class="gauge-bg"></div>
+            <div class="gauge-fill" id="gauge_move"></div>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+        <div class="section-top">
+            <h2>81 İl Maaş Kıyaslaması</h2>
+        </div>
+
+        <div class="bar-chart">
+            {% for s in sehirler %}
+
+            <div class="bar-wrapper">
+                <div
+                    class="bar {% if s == secilen_sehir %}bar-active{% endif %}"
+                    style="height: {{ range(30, 140) | random }}px;"
+                ></div>
+
+                <span class="city-name {% if s == secilen_sehir %}city-active{% endif %}">
+                    {{ s }}
+                </span>
+            </div>
+
+            {% endfor %}
+        </div>
+    </div>
+
+    {% endif %}
+
+
+    <div class="card">
+
+        <div class="section-top">
+            <h2>Sektör Haberleri</h2>
+        </div>
+
+        {% if haberler %}
+
+            {% for h in haberler %}
+
+            <div class="news-box">
+                <div class="news-tag">
+                    {{ h.tag }}
+                </div>
+
+                <b>
+                    {{ h.baslik }}
+                </b>
+
+                <small>
+                    {{ h.ozet }}
+                </small>
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="empty-news">
+                Analiz sonrası sektör haberleri burada gösterilecek.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script>
+
+const yasInput = document.getElementById('yasInput');
+const deneyimInput = document.getElementById('deneyimInput');
+
+function updateMaxDeneyim() {
+
+    const yas = parseInt(yasInput.value);
+    const maxDeneyim = yas - 18;
+
+    deneyimInput.max = maxDeneyim > 0 ? maxDeneyim : 0;
+
+    if (parseInt(deneyimInput.value) > maxDeneyim) {
+        deneyimInput.value = maxDeneyim > 0 ? maxDeneyim : 0;
+    }
+}
+
+if (yasInput && deneyimInput) {
+    yasInput.addEventListener('input', updateMaxDeneyim);
+    updateMaxDeneyim();
+}
+
+{% if tahmin and tahmin > 0 %}
+
+const targetValue = {{ tahmin }};
+
+const countUp = new CountUp('sayac_ana', targetValue, {
+    separator: '.',
+    decimal: ',',
+    duration: 2.5,
+    suffix: ' ₺'
+});
+
+if (!countUp.error) {
+    countUp.start();
+}
+
+setTimeout(() => {
+
+    let deg = ({{ oran }} * 18) - 45;
+
+    if (deg > 135) {
+        deg = 135;
+    }
+
+    document.getElementById('gauge_move').style.transform = `rotate(${deg}deg)`;
+
+}, 400);
+
+{% endif %}
+
+</script>
+
+</body>
+</html>
+```
+
+# static/css/style.css
+
+```css
+:root {
+    --bg: #070707;
+    --card: rgba(18,18,18,0.55);
+    --border: rgba(255,255,255,0.08);
+    --text: #f2f2f2;
+    --muted: #9a9a9a;
+    --bordo: #7a0019;
+    --red: #ff3b5c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+    padding: 20px 14px 60px;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('../images/bg.jpg') center/cover no-repeat;
+    transform: scale(1.08);
+    filter: blur(6px);
+    z-index: -2;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    z-index: -1;
+}
+
+.container {
+    width: 100%;
+    max-width: 650px;
+    margin: auto;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+}
+
+.hero-card {
+    border-top: 3px solid var(--red);
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 22px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 7px;
+    font-size: 12px;
+    color: #bdbdbd;
+}
+
+input,
+select {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white;
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.25s;
+}
+
+input:focus,
+select:focus {
+    border-color: rgba(255,59,92,0.7);
+    box-shadow: 0 0 18px rgba(255,59,92,0.25);
+}
+
+.city-group {
+    margin-top: 14px;
+}
+
+.btn {
+    width: 100%;
+    margin-top: 20px;
+    border: none;
+    border-radius: 16px;
+    padding: 15px;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(135deg, #7a0019, #c11234);
+    transition: 0.3s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(193,18,52,0.35);
+}
+
+.result-card {
+    text-align: center;
+}
+
+.result-label {
+    color: #bcbcbc;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.price-text {
+    font-size: 42px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.oran-text {
+    color: #cfcfcf;
+    font-size: 14px;
+}
+
+.oran-text span {
+    color: var(--red);
+    font-weight: 700;
+}
+
+.gauge-wrap {
+    width: 160px;
+    height: 80px;
+    margin: 24px auto 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.gauge-bg {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 14px solid rgba(255,255,255,0.08);
+}
+
+.gauge-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 14px solid var(--red);
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    transform: rotate(-45deg);
+    transition: 1.5s ease;
+}
+
+.section-top {
+    margin-bottom: 18px;
+}
+
+.section-top h2 {
+    font-size: 18px;
+}
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.bar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 28px;
+}
+
+.bar {
+    width: 18px;
+    border-radius: 12px 12px 4px 4px;
+    background: rgba(255,255,255,0.15);
+    transition: 0.3s;
+}
+
+.bar-active {
+    background: linear-gradient(180deg, #ff5573, #c11234);
+    box-shadow: 0 0 20px rgba(255,85,115,0.5);
+}
+
+.city-name {
+    margin-top: 8px;
+    font-size: 9px;
+    color: #9e9e9e;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+}
+
+.city-active {
+    color: white;
+    font-weight: 700;
+}
+
+.news-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 14px;
+}
+
+.news-tag {
+    display: inline-block;
+    background: rgba(255,59,92,0.14);
+    color: #ff6b84;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+
+.news-box b {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.news-box small {
+    color: #b5b5b5;
+    line-height: 1.6;
+    font-size: 12px;
+}
+
+.empty-news {
+    color: #9d9d9d;
+    font-size: 13px;
+}
+
+.error-msg {
+    background: rgba(255,59,92,0.12);
+    border: 1px solid rgba(255,59,92,0.4);
+    color: #ff6f87;
+    padding: 14px;
+    border-radius: 18px;
+    margin-bottom: 18px;
+    text-align: center;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 16px 10px 50px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .price-text {
+        font-size: 34px;
+    }
+
+    .card {
+        border-radius: 20px;
+        padding: 16px;
+    }
+
+}
+```
+
+```
+```
 
