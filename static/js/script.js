@@ -1,80 +1,100 @@
-const yasInput = document.getElementById('yasInput');
-const deneyimInput = document.getElementById('deneyimInput');
+window.addEventListener('DOMContentLoaded', () => {
 
-function updateMaxDeneyim() {
+    // YAŞ - DENEYİM KONTROLÜ
+    const yasInput = document.getElementById('yasInput');
+    const deneyimInput = document.getElementById('deneyimInput');
 
-    if (!yasInput || !deneyimInput) return;
+    function updateMaxDeneyim() {
 
-    const yas = parseInt(yasInput.value);
-    const maxDeneyim = yas - 18;
+        if (!yasInput || !deneyimInput) return;
 
-    deneyimInput.max = maxDeneyim > 0 ? maxDeneyim : 0;
+        const yas = parseInt(yasInput.value) || 18;
+        const maxDeneyim = yas - 18;
 
-    if (parseInt(deneyimInput.value) > maxDeneyim) {
-
-        deneyimInput.value = maxDeneyim > 0
+        deneyimInput.max = maxDeneyim > 0
             ? maxDeneyim
             : 0;
+
+        if (parseInt(deneyimInput.value) > maxDeneyim) {
+
+            deneyimInput.value =
+                maxDeneyim > 0
+                ? maxDeneyim
+                : 0;
+        }
     }
-}
 
-if (yasInput && deneyimInput) {
+    if (yasInput && deneyimInput) {
 
-    yasInput.addEventListener(
-        'input',
-        updateMaxDeneyim
-    );
-
-    updateMaxDeneyim();
-}
-
-
-// COUNTUP
-const maasElement = document.getElementById('sayac_ana');
-
-if (maasElement) {
-
-    const rawValue = maasElement.dataset.value;
-
-    if (rawValue) {
-
-        const targetValue = parseInt(rawValue);
-
-        const countUp = new CountUp(
-            'sayac_ana',
-            targetValue,
-            {
-                separator: '.',
-                decimal: ',',
-                duration: 2.5,
-                suffix: ' ₺'
-            }
+        yasInput.addEventListener(
+            'input',
+            updateMaxDeneyim
         );
 
-        if (!countUp.error) {
-            countUp.start();
+        updateMaxDeneyim();
+    }
+
+
+    // MAAŞ ANİMASYONU
+    const maasElement =
+        document.getElementById('sayac_ana');
+
+    if (maasElement) {
+
+        const value =
+            maasElement.getAttribute('data-value');
+
+        const targetValue = parseInt(value);
+
+        if (!isNaN(targetValue)) {
+
+            const countUp = new CountUp(
+                'sayac_ana',
+                targetValue,
+                {
+                    separator: '.',
+                    decimal: ',',
+                    duration: 2.2,
+                    suffix: ' ₺'
+                }
+            );
+
+            if (!countUp.error) {
+
+                countUp.start();
+
+            } else {
+
+                maasElement.innerText =
+                    targetValue.toLocaleString('tr-TR') + ' ₺';
+            }
         }
     }
-}
 
 
-// GAUGE
-const gauge = document.getElementById('gauge_move');
+    // GAUGE
+    const gauge =
+        document.getElementById('gauge_move');
 
-if (gauge) {
+    if (gauge) {
 
-    const oran = parseFloat(gauge.dataset.oran);
+        const oran =
+            parseFloat(
+                gauge.getAttribute('data-oran')
+            );
 
-    setTimeout(() => {
+        setTimeout(() => {
 
-        let deg = (oran * 18) - 45;
+            let deg = (oran * 18) - 45;
 
-        if (deg > 135) {
-            deg = 135;
-        }
+            if (deg > 135) {
+                deg = 135;
+            }
 
-        gauge.style.transform =
-            `rotate(${deg}deg)`;
+            gauge.style.transform =
+                `rotate(${deg}deg)`;
 
-    }, 400);
-}
+        }, 500);
+    }
+
+});
