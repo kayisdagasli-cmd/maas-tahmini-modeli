@@ -1,173 +1,244 @@
+# templates/index.html
+
+```html
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Maaş Tahmin Modeli</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
     <script src="https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"></script>
-    <style>
-        :root { --bordo: #800000; --bg: #0b0b0b; --card: #161616; --text: #e0e0e0; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 10px; overflow-x: hidden; }
-        .container { max-width: 600px; margin: auto; }
-        
-        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #222; border-top: 3px solid var(--bordo); margin-bottom: 12px; }
-        h3 { margin-top: 0; font-size: 16px; color: white; }
-        
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        label { font-size: 11px; color: #888; margin-bottom: 4px; display: block; }
-        input, select { width: 100%; padding: 10px; background: #222; border: 1px solid #333; border-radius: 6px; color: white; font-size: 13px; box-sizing: border-box; }
-        
-        .btn { width: 100%; padding: 12px; background: var(--bordo); border: none; border-radius: 6px; color: white; font-weight: bold; margin-top: 15px; font-size: 14px; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: #a00000; }
-        
-        .price-text { font-size: 28px; color: #ff4d4d; font-weight: bold; margin: 5px 0; }
-        
-        /* Gauge Grafik */
-        .gauge-wrap { width: 120px; height: 60px; margin: 10px auto; position: relative; overflow: hidden; }
-        .gauge-bg { width: 120px; height: 120px; border-radius: 50%; border: 10px solid #333; box-sizing: border-box; }
-        .gauge-fill { position: absolute; top: 0; left: 0; width: 120px; height: 120px; border-radius: 50%; border: 10px solid var(--bordo); border-bottom-color: transparent; border-left-color: transparent; transform: rotate(-45deg); transition: 1.5s; box-sizing: border-box; }
-        
-        /* Bar Grafiği */
-        .bar-chart { display: flex; align-items: flex-end; height: 100px; gap: 2px; background: #000; padding: 10px; border-radius: 10px; overflow-x: auto; }
-        .bar { min-width: 6px; background: #4a0000; height: 10px; transition: 0.3s; }
-        .bar-active { background: #ff4d4d; min-width: 10px; box-shadow: 0 0 10px #ff4d4d; }
-
-        .news-box { background: #1a1a1a; padding: 10px; border-radius: 8px; border-left: 3px solid var(--bordo); margin-bottom: 8px; }
-        .news-box b { font-size: 13px; display: block; margin-bottom: 3px; }
-        .news-box small { font-size: 11px; color: #888; }
-
-        /* Hata Mesajı */
-        .error-msg { background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; color: #ff4d4d; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 10px; text-align: center; }
-    </style>
 </head>
 <body>
-    <div class="container">
-        {% if hata %}
-        <div class="error-msg">{{ hata }}</div>
-        {% endif %}
 
-        <div class="card">
-            <h3>Maaş Tahmin Modeli</h3>
-            <form action="/predict" method="post" id="salaryForm">
-                <div class="grid">
-                    <div>
-                        <label>Yaş</label>
-                        <input type="number" name="yas" id="yasInput" min="18" max="65" value="{{ yas if yas else 25 }}" required>
-                    </div>
-                    <div>
-                        <label>Deneyim (Yıl)</label>
-                        <input type="number" name="deneyim" id="deneyimInput" min="0" value="{{ deneyim if deneyim else 0 }}" required>
-                    </div>
-                    <div>
-                        <label>Eğitim</label>
-                        <select name="egitim">
-                            <option {% if egitim == 'Lise' %}selected{% endif %}>Lise</option>
-                            <option {% if not egitim or egitim == 'Lisans' %}selected{% endif %}>Lisans</option>
-                            <option {% if egitim == 'Yüksek Lisans' %}selected{% endif %}>Yüksek Lisans</option>
-                            <option {% if egitim == 'Doktora' %}selected{% endif %}>Doktora</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Meslek</label>
-                        <select name="meslek">
-                            {% for m in meslekler %}
-                            <option {% if m == meslek %}selected{% endif %}>{{ m }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+<div class="overlay"></div>
+
+<div class="container">
+
+    {% if hata %}
+    <div class="error-msg">
+        {{ hata }}
+    </div>
+    {% endif %}
+
+    <div class="card hero-card">
+        <h1>Maaş Tahmin Sistemi</h1>
+        <p class="subtitle">
+            81 il için gelişmiş maaş analiz sistemi
+        </p>
+
+        <form action="/predict" method="post" id="salaryForm">
+
+            <div class="grid">
+
+                <div class="input-group">
+                    <label>Yaş</label>
+                    <input 
+                        type="number" 
+                        name="yas" 
+                        id="yasInput"
+                        min="18"
+                        max="65"
+                        value="{{ yas if yas else 25 }}"
+                        required
+                    >
                 </div>
-                <div style="margin-top:10px;">
-                    <label>Şehir</label>
-                    <select name="sehir">
-                        {% for s in sehirler %}
-                        <option {% if s == secilen_sehir %}selected{% endif %}>{{ s }}</option>
+
+                <div class="input-group">
+                    <label>Deneyim (Yıl)</label>
+                    <input 
+                        type="number" 
+                        name="deneyim" 
+                        id="deneyimInput"
+                        min="0"
+                        value="{{ deneyim if deneyim else 0 }}"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label>Eğitim</label>
+                    <select name="egitim">
+                        <option {% if egitim == 'Lise' %}selected{% endif %}>Lise</option>
+                        <option {% if not egitim or egitim == 'Lisans' %}selected{% endif %}>Lisans</option>
+                        <option {% if egitim == 'Yüksek Lisans' %}selected{% endif %}>Yüksek Lisans</option>
+                        <option {% if egitim == 'Doktora' %}selected{% endif %}>Doktora</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Meslek</label>
+                    <select name="meslek">
+                        {% for m in meslekler %}
+                        <option {% if m == meslek %}selected{% endif %}>{{ m }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn">Maaşı Tahmin Et</button>
-            </form>
-        </div>
 
-        {% if tahmin and tahmin > 0 %}
-        <div class="card" style="text-align: center;">
-            <label>Tahmini Maaş</label>
-            <div class="price-text" id="sayac_ana">0</div>
-            <p style="font-size:12px;">Asgari ücretin <b>{{ oran }}</b> katı.</p>
-            
-            <div class="gauge-wrap">
-                <div class="gauge-bg"></div>
-                <div class="gauge-fill" id="gauge_move"></div>
             </div>
-        </div>
 
-        <div class="card">
-            <h3>81 İl Kıyaslaması</h3>
-            <div class="bar-chart">
-                {% for s in sehirler %}
-                <div class="bar {% if s == secilen_sehir %}bar-active{% endif %}" 
-                     style="height: {{ range(20, 90) | random }}px;" 
-                     title="{{ s }}"></div>
-                {% endfor %}
+            <div class="input-group city-group">
+                <label>Şehir</label>
+                <select name="sehir">
+                    {% for s in sehirler %}
+                    <option {% if s == secilen_sehir %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
             </div>
-        </div>
-        {% endif %}
 
-        <div class="card">
-            <h3>Sektör Haberleri</h3>
-            {% if haberler %}
-                {% for h in haberler %}
-                <div class="news-box">
-                    <b>{{ h.baslik }}</b>
-                    <small>{{ h.ozet }}</small>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p style="font-size:12px; color:#666;">Analiz sonrası güncel haberler burada görünecek.</p>
-            {% endif %}
+            <button type="submit" class="btn">
+                Maaşı Tahmin Et
+            </button>
+
+        </form>
+    </div>
+
+
+    {% if tahmin and tahmin > 0 %}
+
+    <div class="card result-card">
+
+        <p class="result-label">Tahmini Maaş</p>
+
+        <div class="price-text" id="sayac_ana">
+            0
+        </div>
+
+        <p class="oran-text">
+            Asgari ücretin <span>{{ oran }}</span> katı
+        </p>
+
+        <div class="gauge-wrap">
+            <div class="gauge-bg"></div>
+            <div class="gauge-fill" id="gauge_move"></div>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+        <div class="section-top">
+            <h2>81 İl Maaş Kıyaslaması</h2>
+        </div>
+
+        <div class="bar-chart">
+            {% for s in sehirler %}
+
+            <div class="bar-wrapper">
+                <div 
+                    class="bar {% if s == secilen_sehir %}bar-active{% endif %}"
+                    style="height: {{ range(30, 140) | random }}px;"
+                ></div>
+
+                <span class="city-name {% if s == secilen_sehir %}city-active{% endif %}">
+                    {{ s }}
+                </span>
+            </div>
+
+            {% endfor %}
         </div>
     </div>
 
-    <script>
-        // Yaş ve Deneyim Dinamik Kontrolü
-        const yasInput = document.getElementById('yasInput');
-        const deneyimInput = document.getElementById('deneyimInput');
+    {% endif %}
 
-        function updateMaxDeneyim() {
-            const yas = parseInt(yasInput.value);
-            const maxDeneyim = yas - 18;
-            deneyimInput.max = maxDeneyim > 0 ? maxDeneyim : 0;
-            if (parseInt(deneyimInput.value) > maxDeneyim) {
-                deneyimInput.value = maxDeneyim > 0 ? maxDeneyim : 0;
-            }
-        }
 
-        yasInput.addEventListener('change', updateMaxDeneyim);
-        updateMaxDeneyim(); // Sayfa yüklendiğinde çalıştır
+    <div class="card">
 
-        {% if tahmin and tahmin > 0 %}
-        // Sayaç Efekti
-        const targetValue = {{ tahmin }};
-        const countUp = new CountUp('sayac_ana', targetValue, { 
-            separator: '.', 
-            decimal: ',', 
-            duration: 2,
-            startVal: 0
-        });
-        
-        if (!countUp.error) {
-            countUp.start();
-        } else {
-            document.getElementById('sayac_ana').innerText = targetValue.toLocaleString('tr-TR') + " ₺";
-        }
+        <div class="section-top">
+            <h2>Sektör Haberleri</h2>
+        </div>
 
-        // Gauge Hareketi
-        setTimeout(() => {
-            // Oranı 0-180 derece arasına scale ediyoruz
-            let deg = ({{ oran }} * 20) - 45; 
-            if (deg > 135) deg = 135;
-            document.getElementById('gauge_move').style.transform = `rotate(${deg}deg)`;
-        }, 300);
+        {% if haberler %}
+
+            {% for h in haberler %}
+
+            <div class="news-box">
+                <div class="news-tag">
+                    {{ h.tag }}
+                </div>
+
+                <b>
+                    {{ h.baslik }}
+                </b>
+
+                <small>
+                    {{ h.ozet }}
+                </small>
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="empty-news">
+                Analiz sonrası sektör haberleri burada gösterilecek.
+            </p>
+
         {% endif %}
-    </script>
+
+    </div>
+
+</div>
+
+<script>
+
+const yasInput = document.getElementById('yasInput');
+const deneyimInput = document.getElementById('deneyimInput');
+
+function updateMaxDeneyim() {
+
+    const yas = parseInt(yasInput.value);
+    const maxDeneyim = yas - 18;
+
+    deneyimInput.max = maxDeneyim > 0 ? maxDeneyim : 0;
+
+    if (parseInt(deneyimInput.value) > maxDeneyim) {
+        deneyimInput.value = maxDeneyim > 0 ? maxDeneyim : 0;
+    }
+}
+
+if (yasInput && deneyimInput) {
+    yasInput.addEventListener('input', updateMaxDeneyim);
+    updateMaxDeneyim();
+}
+
+{% if tahmin and tahmin > 0 %}
+
+const targetValue = {{ tahmin }};
+
+const countUp = new CountUp('sayac_ana', targetValue, {
+    separator: '.',
+    decimal: ',',
+    duration: 2.5,
+    suffix: ' ₺'
+});
+
+if (!countUp.error) {
+    countUp.start();
+}
+
+setTimeout(() => {
+
+    let deg = ({{ oran }} * 18) - 45;
+
+    if (deg > 135) {
+        deg = 135;
+    }
+
+    document.getElementById('gauge_move').style.transform = `rotate(${deg}deg)`;
+
+}, 400);
+
+{% endif %}
+
+</script>
+
 </body>
 </html>
+```
