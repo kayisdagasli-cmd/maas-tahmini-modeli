@@ -36,42 +36,34 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
     // MAAŞ ANİMASYONU
-    const maasElement =
-        document.getElementById('sayac_ana');
+const maasElement =
+    document.getElementById('sayac_ana');
 
-    if (maasElement) {
+if (maasElement) {
 
-        const value =
-            maasElement.getAttribute('data-value');
+    const value =
+        maasElement.dataset.value;
 
-        const targetValue = parseInt(value);
+    const targetValue =
+        parseInt(value);
 
-        if (!isNaN(targetValue)) {
+    if (!isNaN(targetValue)) {
 
-            const countUp = new CountUp(
-                'sayac_ana',
-                targetValue,
-                {
-                    separator: '.',
-                    decimal: ',',
-                    duration: 2.2,
-                    suffix: ' ₺'
-                }
-            );
+        maasElement.innerHTML = "";
 
-            if (!countUp.error) {
-
-                countUp.start();
-
-            } else {
-
-                maasElement.innerText =
-                    targetValue.toLocaleString('tr-TR') + ' ₺';
+        const countUp = new CountUp(
+            'sayac_ana',
+            targetValue,
+            {
+                separator: '.',
+                duration: 2,
+                suffix: ' ₺'
             }
-        }
+        );
+
+        countUp.start();
     }
-
-
+}
     // GAUGE
     const gauge =
         document.getElementById('gauge_move');
