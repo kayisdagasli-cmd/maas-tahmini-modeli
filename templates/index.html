@@ -143,12 +143,8 @@
             Tahmini Maaş
         </p>
 
-        <div
-    class="price-text"
-    id="sayac_ana"
-    data-value="{{ tahmin }}"
->
-    {{ tahmin }} ₺
+     <div class="price-text">
+    {{ "{:,}".format(tahmin).replace(",", ".") }} ₺
 </div>
 
         <p class="oran-text">
