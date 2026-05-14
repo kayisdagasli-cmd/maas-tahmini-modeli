@@ -11,19 +11,29 @@ window.onload = function () {
 
         if (!yasInput || !deneyimInput) return;
 
+        // Yaş boşsa minimum 18 kabul et
         const yas =
             parseInt(yasInput.value) || 18;
 
-        const maxDeneyim = yas - 18;
+        // Negatif çıkmasını engelle
+        const maxDeneyim =
+            Math.max(0, yas - 18);
 
         deneyimInput.max = maxDeneyim;
 
-        if (
-            parseInt(deneyimInput.value)
-            > maxDeneyim
-        ) {
+        // Deneyim boşsa 0 kabul et
+        const mevcutDeneyim =
+            parseInt(deneyimInput.value) || 0;
+
+        if (mevcutDeneyim > maxDeneyim) {
 
             deneyimInput.value = maxDeneyim;
+        }
+
+        // Negatif deneyimi engelle
+        if (mevcutDeneyim < 0) {
+
+            deneyimInput.value = 0;
         }
     }
 
