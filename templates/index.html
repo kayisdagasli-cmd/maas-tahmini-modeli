@@ -69,12 +69,32 @@
 
                     <select name="egitim">
 
-                        <option value="Lise">Lise</option>
-<option value="Ön Lisans">Ön Lisans</option>
-<option value="Lisans">Lisans</option>
-<option value="Yüksek Lisans">Yüksek Lisans</option>
-<option value="Doktora">Doktora</option>
-                    </select>
+    <option value="Lise"
+    {% if egitim == "Lise" %}selected{% endif %}>
+    Lise
+    </option>
+
+    <option value="Ön Lisans"
+    {% if egitim == "Ön Lisans" %}selected{% endif %}>
+    Ön Lisans
+    </option>
+
+    <option value="Lisans"
+    {% if egitim == "Lisans" %}selected{% endif %}>
+    Lisans
+    </option>
+
+    <option value="Yüksek Lisans"
+    {% if egitim == "Yüksek Lisans" %}selected{% endif %}>
+    Yüksek Lisans
+    </option>
+
+    <option value="Doktora"
+    {% if egitim == "Doktora" %}selected{% endif %}>
+    Doktora
+    </option>
+
+</select>
                 </div>
 
                 <div class="input-group">
