@@ -46,7 +46,7 @@ def init_db():
 init_db()
 
 # ASGARİ ÜCRET
-ASGARI_UCRET = 17002
+ASGARI_UCRET = 28000
 
 # 81 İL
 sehirler = [
@@ -123,12 +123,24 @@ sehir_katsayi = {
 
 try:
 
+    haber_kelimeleri = [
+        "yazılım",
+        "yapay zeka",
+        "teknoloji",
+        "siber güvenlik",
+        "startup",
+        "mobil uygulama",
+        "veri bilimi"
+    ]
+
+    secilen_kelime = random.choice(haber_kelimeleri)
+
     url = (
         "https://newsapi.org/v2/everything?"
-        "q=yazilim OR yapay zeka OR teknoloji"
+        f"q={secilen_kelime}"
         "&language=tr"
-        "&sortBy=publishedAt"
-        "&pageSize=3"
+        "&sortBy=popularity"
+        f"&pageSize={random.randint(3,6)}"
         "&apiKey=b8d4b10143624a96aa085bc8fb0540a4"
     )
 
@@ -138,11 +150,11 @@ try:
 
     haberler = []
 
-    for article in data["articles"]:
+    for article in data["articles"][:3]:
 
         haberler.append({
 
-            "tag": "GÜNCEL",
+            "tag": secilen_kelime.upper(),
 
             "baslik": article["title"],
 
