@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request
 import random
 import sqlite3
-from datetime import datetime
-
+from datetime import datetime, timedelta
 app = Flask(__name__)
 
 # DATABASE OLUŞTUR
@@ -297,8 +296,7 @@ def predict():
             meslek,
             secilen_sehir,
             maas,
-            datetime.now().strftime("%d-%m-%Y %H:%M")
-
+          (datetime.now() + timedelta(hours=3)).strftime("%d-%m-%Y %H:%M")
         ))
 
         conn.commit()
