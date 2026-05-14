@@ -1,6 +1,6 @@
 :root {
     --bg: #050505;
-    --card: rgba(16,16,16,0.52);
+    --card: rgba(16,16,16,0.45);
     --border: rgba(255,255,255,0.07);
     --text: #f5f5f5;
     --muted: #9d9d9d;
@@ -29,7 +29,7 @@ body::before {
     position: fixed;
     inset: 0;
     background: url('../images/bg.jpg') center/cover no-repeat;
-    filter: brightness(0.45);
+    filter: brightness(0.78) contrast(1.08);
     transform: scale(1);
     z-index: -2;
 }
@@ -37,7 +37,7 @@ body::before {
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.76);
+    background: rgba(0,0,0,0.42);
     z-index: -1;
 }
 
@@ -48,14 +48,14 @@ body::before {
 }
 
 .card {
-    background: var(--card);
+    background: rgba(16,16,16,0.38);
     border: 1px solid var(--border);
     border-radius: 18px;
     padding: 13px;
     margin-bottom: 12px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.28);
 }
 
 .hero-card {
@@ -69,7 +69,7 @@ h1 {
 }
 
 .subtitle {
-    color: var(--muted);
+    color: #d7d7d7;
     font-size: 11px;
     margin-bottom: 14px;
 }
@@ -87,15 +87,15 @@ h1 {
 
 label {
     font-size: 10px;
-    color: #bcbcbc;
+    color: #ebebeb;
     margin-bottom: 5px;
 }
 
 input,
 select {
     width: 100%;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.08);
     color: white;
     border-radius: 10px;
     padding: 9px;
@@ -106,8 +106,8 @@ select {
 
 input:focus,
 select:focus {
-    border-color: rgba(255,59,92,0.6);
-    box-shadow: 0 0 14px rgba(255,59,92,0.2);
+    border-color: rgba(255,59,92,0.7);
+    box-shadow: 0 0 14px rgba(255,59,92,0.22);
 }
 
 option {
@@ -142,7 +142,7 @@ option {
 }
 
 .result-label {
-    color: #c2c2c2;
+    color: #ededed;
     font-size: 11px;
     margin-bottom: 5px;
 }
@@ -156,11 +156,11 @@ option {
 
 .oran-text {
     font-size: 12px;
-    color: #d0d0d0;
+    color: #ececec;
 }
 
 .oran-text span {
-    color: var(--red);
+    color: #ff758f;
     font-weight: 700;
 }
 
@@ -176,7 +176,7 @@ option {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    border: 10px solid rgba(255,255,255,0.08);
+    border: 10px solid rgba(255,255,255,0.12);
 }
 
 .gauge-fill {
@@ -219,18 +219,18 @@ option {
 .bar {
     width: 12px;
     border-radius: 8px 8px 3px 3px;
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.18);
 }
 
 .bar-active {
     background: linear-gradient(180deg, #ff5573, #c11234);
-    box-shadow: 0 0 14px rgba(255,85,115,0.4);
+    box-shadow: 0 0 14px rgba(255,85,115,0.45);
 }
 
 .city-name {
     margin-top: 5px;
     font-size: 7px;
-    color: #9d9d9d;
+    color: #f0f0f0;
     writing-mode: vertical-rl;
     transform: rotate(180deg);
 }
@@ -241,8 +241,8 @@ option {
 }
 
 .news-box {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.07);
     border-radius: 12px;
     padding: 11px;
     margin-bottom: 10px;
@@ -250,8 +250,8 @@ option {
 
 .news-tag {
     display: inline-block;
-    background: rgba(255,59,92,0.13);
-    color: #ff6e88;
+    background: rgba(255,59,92,0.16);
+    color: #ff8ca1;
     padding: 3px 8px;
     border-radius: 999px;
     font-size: 9px;
@@ -265,20 +265,20 @@ option {
 }
 
 .news-box small {
-    color: #b9b9b9;
+    color: #efefef;
     line-height: 1.4;
     font-size: 10px;
 }
 
 .empty-news {
-    color: #9f9f9f;
+    color: #f0f0f0;
     font-size: 11px;
 }
 
 .error-msg {
     background: rgba(255,59,92,0.12);
     border: 1px solid rgba(255,59,92,0.35);
-    color: #ff6f87;
+    color: #ff8ca1;
     padding: 10px;
     border-radius: 12px;
     text-align: center;
