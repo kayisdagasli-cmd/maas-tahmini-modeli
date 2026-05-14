@@ -131,16 +131,50 @@ LIMIT 5
 son_tahminler = cursor.fetchall()
 conn.close()
 
+# GERÇEK HABERLER
 
-# HABERLER
-haber_havuzu = [
-    {"tag": "AI", "baslik": "Yapay zeka maaşları yükselişte", "ozet": "AI uzmanlarına olan talep 2025 yılında ciddi şekilde artıyor."},
-    {"tag": "Cyber Security", "baslik": "Siber güvenlik uzmanı açığı büyüyor", "ozet": "Şirketler güvenlik yatırımlarını hızlandırıyor."},
-    {"tag": "Remote", "baslik": "Uzaktan çalışma kalıcı hale geldi", "ozet": "Global şirketler remote mühendis alımını sürdürüyor."},
-    {"tag": "Cloud", "baslik": "Bulut sistemleri yükselişte", "ozet": "AWS ve Azure uzmanları daha yüksek maaş alıyor."},
-    {"tag": "Startup", "baslik": "Teknoloji girişimleri büyüyor", "ozet": "Yazılım sektöründe yatırım hacmi artıyor."},
-    {"tag": "Data", "baslik": "Veri bilimi en güçlü alanlardan biri", "ozet": "Veri odaklı şirketlerin sayısı hızla yükseliyor."}
-]
+try:
+
+    url = (
+        "https://newsapi.org/v2/everything?"
+        "q=yazilim OR yapay zeka OR teknoloji"
+        "&language=tr"
+        "&sortBy=publishedAt"
+        "&pageSize=3"
+        "&apiKey=b8d4b10143624a96aa085bc8fb0540a4"
+    )
+
+    response = requests.get(url)
+
+    data = response.json()
+
+    haberler = []
+
+    for article in data["articles"]:
+
+        haberler.append({
+
+            "tag": "GÜNCEL",
+
+            "baslik": article["title"],
+
+            "ozet": (
+                article["description"]
+                if article["description"]
+                else "Detay bulunamadı."
+            )
+
+        })
+
+except:
+
+    haberler = [
+        {
+            "tag": "SİSTEM",
+            "baslik": "Haber sistemi yüklenemedi",
+            "ozet": "API bağlantısı kurulamadı."
+        }
+    ]
 
 
 @app.route('/')
