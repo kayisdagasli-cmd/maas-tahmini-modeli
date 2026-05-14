@@ -69,32 +69,32 @@
 
                     <select name="egitim">
 
-    <option value="Lise"
-    {% if egitim == "Lise" %}selected{% endif %}>
-    Lise
-    </option>
+                        <option value="Lise"
+                        {% if egitim == "Lise" %}selected{% endif %}>
+                        Lise
+                        </option>
 
-    <option value="Ön Lisans"
-    {% if egitim == "Ön Lisans" %}selected{% endif %}>
-    Ön Lisans
-    </option>
+                        <option value="Ön Lisans"
+                        {% if egitim == "Ön Lisans" %}selected{% endif %}>
+                        Ön Lisans
+                        </option>
 
-    <option value="Lisans"
-    {% if egitim == "Lisans" %}selected{% endif %}>
-    Lisans
-    </option>
+                        <option value="Lisans"
+                        {% if egitim == "Lisans" %}selected{% endif %}>
+                        Lisans
+                        </option>
 
-    <option value="Yüksek Lisans"
-    {% if egitim == "Yüksek Lisans" %}selected{% endif %}>
-    Yüksek Lisans
-    </option>
+                        <option value="Yüksek Lisans"
+                        {% if egitim == "Yüksek Lisans" %}selected{% endif %}>
+                        Yüksek Lisans
+                        </option>
 
-    <option value="Doktora"
-    {% if egitim == "Doktora" %}selected{% endif %}>
-    Doktora
-    </option>
+                        <option value="Doktora"
+                        {% if egitim == "Doktora" %}selected{% endif %}>
+                        Doktora
+                        </option>
 
-</select>
+                    </select>
                 </div>
 
                 <div class="input-group">
@@ -152,9 +152,9 @@
             Tahmini Maaş
         </p>
 
-     <div class="price-text">
-    {{ "{:,}".format(tahmin).replace(",", ".") }} ₺
-</div>
+        <div class="price-text">
+            {{ "{:,}".format(tahmin).replace(",", ".") }} ₺
+        </div>
 
         <p class="oran-text">
             Asgari ücretin <span>{{ oran }}</span> katı
@@ -241,6 +241,45 @@
 
             <p class="empty-news">
                 Analiz sonrası sektör haberleri burada gösterilecek.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="section-top">
+            <h2>Son Tahminler</h2>
+        </div>
+
+        {% if son_tahminler %}
+
+            {% for tahmin in son_tahminler %}
+
+            <div class="news-box">
+
+                <div class="news-tag">
+                    {{ tahmin[3] }}
+                </div>
+
+                <b>
+                    {{ tahmin[0] }}
+                </b>
+
+                <small>
+                    {{ tahmin[1] }} • {{ "{:,}".format(tahmin[2]).replace(",", ".") }} ₺
+                </small>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="empty-news">
+                Henüz kayıt bulunmuyor.
             </p>
 
         {% endif %}
