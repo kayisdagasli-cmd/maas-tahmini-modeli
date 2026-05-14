@@ -54,12 +54,12 @@ meslek_katsayi = {
     "Veri Bilimci": 1.70
 }
 
-# EĞİTİM KATSAYISI
 egitim_katsayi = {
-    "Lise": 0.85,
-    "Lisans": 1.0,
-    "Yüksek Lisans": 1.18,
-    "Doktora": 1.35
+    "Lise": 0.9,
+    "Ön Lisans": 1.05,
+    "Lisans": 1.2,
+    "Yüksek Lisans": 1.45,
+    "Doktora": 1.7
 }
 
 # ŞEHİR KATSAYISI
