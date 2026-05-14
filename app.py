@@ -176,10 +176,34 @@ haber_havuzu = [
 @app.route('/')
 def index():
 
+    conn = sqlite3.connect("database.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    SELECT meslek, sehir, maas, tarih
+
+    FROM tahminler
+
+    ORDER BY id DESC
+
+    LIMIT 5
+
+    """)
+
+    son_tahminler = cursor.fetchall()
+
+    conn.close()
+
     return render_template(
+
         'index.html',
+
         sehirler=sehirler,
-        meslekler=meslekler
+        meslekler=meslekler,
+
+        son_tahminler=son_tahminler
     )
 
 
