@@ -307,7 +307,62 @@ def predict():
 
         son_tahminler = cursor.fetchall()
         conn.close()
+                # YENİ HABERLER ÇEK
 
+        try:
+
+            haber_kelimeleri = [
+                "yazılım",
+                "yapay zeka",
+                "teknoloji",
+                "siber güvenlik",
+                "startup",
+                "mobil uygulama",
+                "veri bilimi"
+            ]
+
+            secilen_kelime = random.choice(haber_kelimeleri)
+
+            url = (
+                "https://newsapi.org/v2/everything?"
+                f"q={secilen_kelime}"
+                "&language=tr"
+                "&sortBy=popularity"
+                f"&pageSize={random.randint(3,6)}"
+                "&apiKey=b8d4b10143624a96aa085bc8fb0540a4"
+            )
+
+            response = requests.get(url)
+
+            data = response.json()
+
+            haberler = []
+
+            for article in data["articles"][:3]:
+
+                haberler.append({
+
+                    "tag": secilen_kelime.upper(),
+
+                    "baslik": article["title"],
+
+                    "ozet": (
+                        article["description"]
+                        if article["description"]
+                        else "Detay bulunamadı."
+                    )
+
+                })
+
+        except:
+
+            haberler = [
+                {
+                    "tag": "SİSTEM",
+                    "baslik": "Haber sistemi yüklenemedi",
+                    "ozet": "API bağlantısı kurulamadı."
+                }
+            ]
         return render_template(
             'index.html',
             tahmin=maas,
