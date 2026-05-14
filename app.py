@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 import random
-
 import sqlite3
 from datetime import datetime
 
@@ -44,6 +43,7 @@ def init_db():
 
 
 init_db()
+
 # ASGARİ ÜCRET
 ASGARI_UCRET = 17002
 
@@ -95,6 +95,7 @@ meslek_katsayi = {
     "Veri Bilimci": 1.70
 }
 
+# EĞİTİM KATSAYILARI
 egitim_katsayi = {
     "Lise": 0.9,
     "Ön Lisans": 1.05,
@@ -154,6 +155,7 @@ haber_havuzu = [
 
 @app.route('/')
 def index():
+
     return render_template(
         'index.html',
         sehirler=sehirler,
@@ -202,7 +204,7 @@ def predict():
         egitim_orani = egitim_katsayi.get(egitim, 1.0)
         sehir_orani = sehir_katsayi.get(secilen_sehir, 1.0)
 
-        # DENEYİM ETKİSİ
+        # DENEYİM BONUSU
         deneyim_bonus = deneyim * 4500
 
         # ANA HESAP
@@ -222,7 +224,44 @@ def predict():
         # ASGARİ ÜCRET ORANI
         oran = round(maas / ASGARI_UCRET, 1)
 
-        # ŞEHİR GRAFİK VERİSİ
+        # DATABASE KAYIT
+        conn = sqlite3.connect("database.db")
+
+        cursor = conn.cursor()
+
+        cursor.execute("""
+
+        INSERT INTO tahminler (
+
+            yas,
+            deneyim,
+            egitim,
+            meslek,
+            sehir,
+            maas,
+            tarih
+
+        )
+
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+
+        """, (
+
+            yas,
+            deneyim,
+            egitim,
+            meslek,
+            secilen_sehir,
+            maas,
+            datetime.now().strftime("%d-%m-%Y %H:%M")
+
+        ))
+
+        conn.commit()
+
+        conn.close()
+
+        # ŞEHİR GRAFİĞİ
         grafik_verileri = {}
 
         for sehir in sehirler:
@@ -244,6 +283,7 @@ def predict():
         haberler = random.sample(haber_havuzu, 3)
 
         return render_template(
+
             'index.html',
 
             tahmin=maas,
@@ -269,6 +309,7 @@ def predict():
         print(e)
 
         return render_template(
+
             'index.html',
 
             hata="Bir hata oluştu.",
