@@ -322,7 +322,28 @@ def predict():
             sehir_maas *= random.uniform(0.95, 1.05)
 
             grafik_verileri[sehir] = int(sehir_maas)
+            
+        # SON TAHMİNLERİ ÇEK
 
+conn = sqlite3.connect("database.db")
+
+cursor = conn.cursor()
+
+cursor.execute("""
+
+SELECT meslek, sehir, maas, tarih
+
+FROM tahminler
+
+ORDER BY id DESC
+
+LIMIT 5
+
+""")
+
+son_tahminler = cursor.fetchall()
+
+conn.close()
         # HABERLER
         haberler = random.sample(haber_havuzu, 3)
 
