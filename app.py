@@ -116,59 +116,30 @@ sehir_katsayi = {
     "Eskişehir": 1.12,
     "Sakarya": 1.11
 }
+
 # SON TAHMİNLERİ ÇEK
-
 conn = sqlite3.connect("database.db")
-
 cursor = conn.cursor()
 
 cursor.execute("""
-
 SELECT meslek, sehir, maas, tarih
-
 FROM tahminler
-
 ORDER BY id DESC
-
 LIMIT 5
-
 """)
 
 son_tahminler = cursor.fetchall()
-
 conn.close()
+
+
 # HABERLER
 haber_havuzu = [
-    {
-        "tag": "AI",
-        "baslik": "Yapay zeka maaşları yükselişte",
-        "ozet": "AI uzmanlarına olan talep 2025 yılında ciddi şekilde artıyor."
-    },
-    {
-        "tag": "Cyber Security",
-        "baslik": "Siber güvenlik uzmanı açığı büyüyor",
-        "ozet": "Şirketler güvenlik yatırımlarını hızlandırıyor."
-    },
-    {
-        "tag": "Remote",
-        "baslik": "Uzaktan çalışma kalıcı hale geldi",
-        "ozet": "Global şirketler remote mühendis alımını sürdürüyor."
-    },
-    {
-        "tag": "Cloud",
-        "baslik": "Bulut sistemleri yükselişte",
-        "ozet": "AWS ve Azure uzmanları daha yüksek maaş alıyor."
-    },
-    {
-        "tag": "Startup",
-        "baslik": "Teknoloji girişimleri büyüyor",
-        "ozet": "Yazılım sektöründe yatırım hacmi artıyor."
-    },
-    {
-        "tag": "Data",
-        "baslik": "Veri bilimi en güçlü alanlardan biri",
-        "ozet": "Veri odaklı şirketlerin sayısı hızla yükseliyor."
-    }
+    {"tag": "AI", "baslik": "Yapay zeka maaşları yükselişte", "ozet": "AI uzmanlarına olan talep 2025 yılında ciddi şekilde artıyor."},
+    {"tag": "Cyber Security", "baslik": "Siber güvenlik uzmanı açığı büyüyor", "ozet": "Şirketler güvenlik yatırımlarını hızlandırıyor."},
+    {"tag": "Remote", "baslik": "Uzaktan çalışma kalıcı hale geldi", "ozet": "Global şirketler remote mühendis alımını sürdürüyor."},
+    {"tag": "Cloud", "baslik": "Bulut sistemleri yükselişte", "ozet": "AWS ve Azure uzmanları daha yüksek maaş alıyor."},
+    {"tag": "Startup", "baslik": "Teknoloji girişimleri büyüyor", "ozet": "Yazılım sektöründe yatırım hacmi artıyor."},
+    {"tag": "Data", "baslik": "Veri bilimi en güçlü alanlardan biri", "ozet": "Veri odaklı şirketlerin sayısı hızla yükseliyor."}
 ]
 
 
@@ -176,32 +147,22 @@ haber_havuzu = [
 def index():
 
     conn = sqlite3.connect("database.db")
-
     cursor = conn.cursor()
 
     cursor.execute("""
-
     SELECT meslek, sehir, maas, tarih
-
     FROM tahminler
-
     ORDER BY id DESC
-
     LIMIT 5
-
     """)
 
     son_tahminler = cursor.fetchall()
-
     conn.close()
 
     return render_template(
-
         'index.html',
-
         sehirler=sehirler,
         meslekler=meslekler,
-
         son_tahminler=son_tahminler
     )
 
@@ -217,9 +178,7 @@ def predict():
         meslek = request.form.get('meslek')
         secilen_sehir = request.form.get('sehir')
 
-        # YAŞ KONTROLÜ
         if yas < 18 or yas > 65:
-
             return render_template(
                 'index.html',
                 hata="Lütfen 18-65 arasında yaş girin.",
@@ -227,11 +186,9 @@ def predict():
                 meslekler=meslekler
             )
 
-        # DENEYİM KONTROLÜ
         max_deneyim = yas - 18
 
         if deneyim > max_deneyim:
-
             return render_template(
                 'index.html',
                 hata=f"{yas} yaşındaki biri için maksimum {max_deneyim} yıl deneyim girilebilir.",
@@ -239,18 +196,14 @@ def predict():
                 meslekler=meslekler
             )
 
-        # TEMEL MAAŞ
         temel_maas = 22000
 
-        # KATSAYILAR
         meslek_orani = meslek_katsayi.get(meslek, 1.0)
         egitim_orani = egitim_katsayi.get(egitim, 1.0)
         sehir_orani = sehir_katsayi.get(secilen_sehir, 1.0)
 
-        # DENEYİM BONUSU
         deneyim_bonus = deneyim * 4500
 
-        # ANA HESAP
         maas = (
             temel_maas *
             meslek_orani *
@@ -258,24 +211,16 @@ def predict():
             sehir_orani
         ) + deneyim_bonus
 
-        # RANDOM PİYASA ETKİSİ
         maas *= random.uniform(0.96, 1.08)
-
-        # YUVARLAMA
         maas = int(maas)
 
-        # ASGARİ ÜCRET ORANI
         oran = round(maas / ASGARI_UCRET, 1)
 
-        # DATABASE KAYIT
         conn = sqlite3.connect("database.db")
-
         cursor = conn.cursor()
 
         cursor.execute("""
-
         INSERT INTO tahminler (
-
             yas,
             deneyim,
             egitim,
@@ -283,27 +228,21 @@ def predict():
             sehir,
             maas,
             tarih
-
         )
-
         VALUES (?, ?, ?, ?, ?, ?, ?)
-
         """, (
-
             yas,
             deneyim,
             egitim,
             meslek,
             secilen_sehir,
             maas,
-          (datetime.now() + timedelta(hours=3)).strftime("%d-%m-%Y %H:%M")
+            (datetime.utcnow() + timedelta(hours=3)).strftime("%d-%m-%Y %H:%M")
         ))
 
         conn.commit()
-
         conn.close()
 
-        # ŞEHİR GRAFİĞİ
         grafik_verileri = {}
 
         for sehir in sehirler:
@@ -320,48 +259,32 @@ def predict():
             sehir_maas *= random.uniform(0.95, 1.05)
 
             grafik_verileri[sehir] = int(sehir_maas)
-            
-        # SON TAHMİNLERİ ÇEK
 
-conn = sqlite3.connect("database.db")
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
 
-cursor = conn.cursor()
+        cursor.execute("""
+        SELECT meslek, sehir, maas, tarih
+        FROM tahminler
+        ORDER BY id DESC
+        LIMIT 5
+        """)
 
-cursor.execute("""
+        son_tahminler = cursor.fetchall()
+        conn.close()
 
-SELECT meslek, sehir, maas, tarih
-
-FROM tahminler
-
-ORDER BY id DESC
-
-LIMIT 5
-
-""")
-
-son_tahminler = cursor.fetchall()
-
-conn.close()
-        # HABERLER
         haberler = random.sample(haber_havuzu, 3)
 
         return render_template(
-
             'index.html',
-
             tahmin=maas,
             oran=oran,
-
             sehirler=sehirler,
             meslekler=meslekler,
-
             grafik_verileri=grafik_verileri,
-
             haberler=haberler,
             son_tahminler=son_tahminler,
-
             secilen_sehir=secilen_sehir,
-
             yas=yas,
             deneyim=deneyim,
             egitim=egitim,
@@ -369,15 +292,10 @@ conn.close()
         )
 
     except Exception as e:
-
         print(e)
-
         return render_template(
-
             'index.html',
-
             hata="Bir hata oluştu.",
-
             sehirler=sehirler,
             meslekler=meslekler
         )
