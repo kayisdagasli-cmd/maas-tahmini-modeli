@@ -1,8 +1,49 @@
 from flask import Flask, render_template, request
 import random
 
+import sqlite3
+from datetime import datetime
+
 app = Flask(__name__)
 
+# DATABASE OLUŞTUR
+
+def init_db():
+
+    conn = sqlite3.connect("database.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    CREATE TABLE IF NOT EXISTS tahminler (
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        yas INTEGER,
+
+        deneyim INTEGER,
+
+        egitim TEXT,
+
+        meslek TEXT,
+
+        sehir TEXT,
+
+        maas INTEGER,
+
+        tarih TEXT
+
+    )
+
+    """)
+
+    conn.commit()
+
+    conn.close()
+
+
+init_db()
 # ASGARİ ÜCRET
 ASGARI_UCRET = 17002
 
