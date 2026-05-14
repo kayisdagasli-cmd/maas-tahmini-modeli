@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request
 import random
+import requests
 import sqlite3
 from datetime import datetime, timedelta
+
 app = Flask(__name__)
 
 # DATABASE OLUŞTUR
@@ -117,20 +119,6 @@ sehir_katsayi = {
     "Sakarya": 1.11
 }
 
-# SON TAHMİNLERİ ÇEK
-conn = sqlite3.connect("database.db")
-cursor = conn.cursor()
-
-cursor.execute("""
-SELECT meslek, sehir, maas, tarih
-FROM tahminler
-ORDER BY id DESC
-LIMIT 5
-""")
-
-son_tahminler = cursor.fetchall()
-conn.close()
-
 # GERÇEK HABERLER
 
 try:
@@ -197,6 +185,7 @@ def index():
         'index.html',
         sehirler=sehirler,
         meslekler=meslekler,
+        haberler=haberler,
         son_tahminler=son_tahminler
     )
 
@@ -306,8 +295,6 @@ def predict():
 
         son_tahminler = cursor.fetchall()
         conn.close()
-
-        haberler = random.sample(haber_havuzu, 3)
 
         return render_template(
             'index.html',
