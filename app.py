@@ -117,7 +117,27 @@ sehir_katsayi = {
     "Eskişehir": 1.12,
     "Sakarya": 1.11
 }
+# SON TAHMİNLERİ ÇEK
 
+conn = sqlite3.connect("database.db")
+
+cursor = conn.cursor()
+
+cursor.execute("""
+
+SELECT meslek, sehir, maas, tarih
+
+FROM tahminler
+
+ORDER BY id DESC
+
+LIMIT 5
+
+""")
+
+son_tahminler = cursor.fetchall()
+
+conn.close()
 # HABERLER
 haber_havuzu = [
     {
@@ -295,6 +315,7 @@ def predict():
             grafik_verileri=grafik_verileri,
 
             haberler=haberler,
+            son_tahminler=son_tahminler,
 
             secilen_sehir=secilen_sehir,
 
